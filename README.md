@@ -8,4 +8,8 @@ to be performed based on priorities.
 
 ![AO.png](./assets/AO.png?raw=true)
 
+
+// To implement Active Object we need Event Loop APIs, so pending for now after AO APIs have been done. Will continue
+after Event Loop APIs are ready to use.
+
 ## Event Loop
