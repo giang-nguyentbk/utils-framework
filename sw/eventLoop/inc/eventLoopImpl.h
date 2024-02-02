@@ -40,13 +40,23 @@ public:
 
 private:
     void handEpollEvent(const struct epoll_event& event);
-    uint32_t convertToEpollEvents(uint32_t localEvents);
-    uint32_t convertToLocalEvents(uint32_t epollEvents);
     void dispatchEvent(const CallBackFunc& callback, int fd, uint32_t eventMask);
     void executeScheduledEvents();
 
+    /*! @brief Because our local events are:
+    *           + FdEventIn     = 0x001
+    *           + FdEventOut    = 0x002
+    * While epol events defined in epoll.h are:
+    *           + EPOLLIN       = 0x001
+    *           + EPOLLOUT      = 0x040
+    * 
+    * So we need to convert between them.
+    */
+    uint32_t convertToEpollEvents(uint32_t localEvents);
+    uint32_t convertToLocalEvents(uint32_t epollEvents);
+
     int m_epfd;
-    std::thread::id m_thread;
+    std::thread::id m_threadId;
     std::shared_ptr<EventLoopSyscallWrapper> m_syscallWrapper;
     bool m_isRunning;
 
