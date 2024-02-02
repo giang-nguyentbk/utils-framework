@@ -12,4 +12,7 @@ to be performed based on priorities.
 // To implement Active Object we need Event Loop APIs, so pending for now after AO APIs have been done. Will continue
 after Event Loop APIs are ready to use.
 
+// But to implement Event Loop we need Thread Local Linux APIs, so will be back to Event Loop implementation
+after Thread Local Linux APIs are ready to use.
+
 ## Event Loop
