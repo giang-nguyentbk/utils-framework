@@ -4,7 +4,7 @@
 #include <functional>
 #include <string>
 
-namespace CommonFwks
+namespace CommonApis
 {
 namespace ActiveObject 
 {
@@ -48,9 +48,9 @@ public:
     };
 
     /*! @brief Creates a new Active Object for current calling thread.
-    *   @param[in] initFunc A initialization function which is done before any other things are handled. This param is
-    * optional. For example, you can simply can ActiveObjectApi::create() or utilize lamda expressions to pass initFunc
-    * to AO like:
+    *   @param[in] initFunc A optional initialization function which is done before any other things are handled.
+    * For example, you can simply can ActiveObjectApi::create() or utilize lamda expressions to pass initFunc to AO.
+    * Usage:
     * 
     * </code>  
     *   ActiveObjectApi::create([var1, var2, obj1]() 
@@ -59,18 +59,33 @@ public:
     *   });
     * </code>
     * 
-    * You can also pass some variables in current context of main thread to lamda via Capture clause.
+    * You can also give lamda access to variables in current context of main thread via Capture clause.
     * Note that: no param in () and no return for lamda 
-    *   @param[in] schedPolicy 
-    * */
+    *   @param[in] schedPolicy Define Scheduling Policy for the AO. Scheduling::Default is selected by default.
+    *   @return Return a shared pointer to the created AO instance. If the creation fails for any reason, the returned
+    * shared pointer will be nullptr. You need to double check the return pointer before using. Once use_count
+    * of shared pointer becomes zero, the AO thread will automatically terminated after all scheduled functions
+    * in the event queue have been carried out. */
     static std::shared_ptr<ActiveObjectApi> create(const std::function<void()>& initFunc = nullptr, \
                                             const SchedulingPolicy& schedPolicy = SchedulingPolicy::Default);
 
-
+    /*! @brief Creates a new Active Object for current calling thread. Same as above except for giving the name
+    * of master thread for AO thread or AO's itc mailbox naming which is easier for debugging.
+    *   @param[in] name The name of master thread given to AO thread for naming, for example, AO_module1 where
+    * "module1" is the name of master thread (thread naming by prctrl syscall).
+    *   @param[in] initFunc A optional initialization function which is done before any other things are handled.
+    *   @param[in] schedPolicy Define Scheduling Policy for the AO. Scheduling::Default is selected by default.
+    *   @return Return a shared pointer to the created AO instance. If the creation fails for any reason, the returned
+    * shared pointer will be nullptr. You need to double check the return pointer before using. Once use_count
+    * of shared pointer becomes zero, the AO thread will automatically terminated after all scheduled functions
+    * in the event queue have been carried out. */
     static std::shared_ptr<ActiveObjectApi> create(const std::string& name, \
                                             const std::function<void()>& initFunc = nullptr, \
                                             const SchedulingPolicy& schedPolicy = SchedulingPolicy::Default);
 
+    /*! @brief Executes asynchronously a function which is given by master thread in the context of AO thread.
+    *   @param[in] func The function to be executed.
+    */
     virtual void executeFunction(const std::function<void()>& func = nullptr);
 
     // To avoid user doing copy/move operations
@@ -84,10 +99,10 @@ protected:
     ActiveObjectApi() = default;
     ~ActiveObjectApi() = default;
 
-}; // class ActiveObjectIf
+}; // class ActiveObjectApi
 
 } // namespace V1
 
 } // namespace ActiveObject
 
-} // namespace CommonFwks
+} // namespace CommonApis
