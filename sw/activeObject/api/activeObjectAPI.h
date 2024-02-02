@@ -4,7 +4,7 @@
 #include <functional>
 #include <string>
 
-namespace CommonApis
+namespace CommonAPIs
 {
 namespace ActiveObject 
 {
@@ -12,14 +12,14 @@ namespace V1
 {
 /*! @brief Active Objects (AO): Primarily used for managing internal tasks and encapsulating behavior within an object.
 * The focus is on providing a high-level abstraction for asynchronous task execution with its own thread of control.
-* Please use this CommonFwks::ActiveObject::V1::ActiveObjectApi along with CommonFwks::EventLoop::V1::EventLoopApi and
-* CommonFwks::ItcPubSub::V1::ItcPubSubApi.
+* Please use this CommonAPIs::ActiveObject::V1::ActiveObjectAPI along with CommonAPIs::EventLoop::V1::EventLoopApi and
+* CommonAPIs::ItcPubSub::V1::ItcPubSubApi.
 *
 * Example usage:
 *
 * </code>
 *   // some your code ...
-*   std::shared_ptr<ActiveObjectApi> ao = ActiveObjectApi::create();
+*   std::shared_ptr<ActiveObjectAPI> ao = ActiveObjectAPI::create();
 *   if(!ao)
 *   {
 *         // print some error;
@@ -35,7 +35,7 @@ namespace V1
 * Note that: in asynchronous context, the function that is passed to AO must have void return type.
 */
 
-class ActiveObjectApi
+class ActiveObjectAPI
 {
 public:
     /*! @brief Define Linux supported scheduling policies, see man7 pages for more information. Normally, we can simply
@@ -49,11 +49,11 @@ public:
 
     /*! @brief Creates a new Active Object for current calling thread.
     *   @param[in] initFunc A optional initialization function which is done before any other things are handled.
-    * For example, you can simply can ActiveObjectApi::create() or utilize lamda expressions to pass initFunc to AO.
+    * For example, you can simply can ActiveObjectAPI::create() or utilize lamda expressions to pass initFunc to AO.
     * Usage:
     * 
     * </code>  
-    *   ActiveObjectApi::create([var1, var2, obj1]() 
+    *   ActiveObjectAPI::create([var1, var2, obj1]() 
     *   {
     *       // do something here for initialization, for example create AO's mailboxes, doMonitorSomething(),...
     *   });
@@ -66,7 +66,7 @@ public:
     * shared pointer will be nullptr. You need to double check the return pointer before using. Once use_count
     * of shared pointer becomes zero, the AO thread will automatically terminated after all scheduled functions
     * in the event queue have been carried out. */
-    static std::shared_ptr<ActiveObjectApi> create(const std::function<void()>& initFunc = nullptr, \
+    static std::shared_ptr<ActiveObjectAPI> create(const std::function<void()>& initFunc = nullptr, \
                                             const SchedulingPolicy& schedPolicy = SchedulingPolicy::Default);
 
     /*! @brief Creates a new Active Object for current calling thread. Same as above except for giving the name
@@ -79,7 +79,7 @@ public:
     * shared pointer will be nullptr. You need to double check the return pointer before using. Once use_count
     * of shared pointer becomes zero, the AO thread will automatically terminated after all scheduled functions
     * in the event queue have been carried out. */
-    static std::shared_ptr<ActiveObjectApi> create(const std::string& name, \
+    static std::shared_ptr<ActiveObjectAPI> create(const std::string& name, \
                                             const std::function<void()>& initFunc = nullptr, \
                                             const SchedulingPolicy& schedPolicy = SchedulingPolicy::Default);
 
@@ -89,20 +89,20 @@ public:
     virtual void executeFunction(const std::function<void()>& func = nullptr);
 
     // To avoid user doing copy/move operations
-    ActiveObjectApi(const ActiveObjectApi&) = delete;
-    ActiveObjectApi(ActiveObjectApi&&) = delete;
-    ActiveObjectApi& operator=(const ActiveObjectApi&) = delete;
-    ActiveObjectApi& operator=(ActiveObjectApi&&) = delete;
+    ActiveObjectAPI(const ActiveObjectAPI&) = delete;
+    ActiveObjectAPI(ActiveObjectAPI&&) = delete;
+    ActiveObjectAPI& operator=(const ActiveObjectAPI&) = delete;
+    ActiveObjectAPI& operator=(ActiveObjectAPI&&) = delete;
 
 protected:
     // Only backend implementation (behind the scene) can define constructor and destructor.
-    ActiveObjectApi() = default;
-    ~ActiveObjectApi() = default;
+    ActiveObjectAPI() = default;
+    ~ActiveObjectAPI() = default;
 
-}; // class ActiveObjectApi
+}; // class ActiveObjectAPI
 
 } // namespace V1
 
 } // namespace ActiveObject
 
-} // namespace CommonApis
+} // namespace CommonAPIs

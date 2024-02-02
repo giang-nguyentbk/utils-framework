@@ -1,4 +1,4 @@
-# commonApis
+# commonAPIs
 
 
 ## [Active Object](https://github.com/giang-nguyentbk/commonApis/tree/activeObject/sw/activeObject)
@@ -8,11 +8,14 @@ to be performed based on priorities.
 
 ![AO.png](./assets/AO.png?raw=true)
 
+Dependencies:
+1. CommonAPIs::EventLoop::V1::EventLoopAPI
+2. CommonAPIs::ThreadLocal::V1::ThreadLocalLinuxAPI
 
 // To implement Active Object we need Event Loop APIs, so pending for now after AO APIs have been done. Will continue
 after Event Loop APIs are ready to use.
 
-// But to implement Event Loop we need Thread Local Linux APIs, so will be back to Event Loop implementation
-after Thread Local Linux APIs are ready to use.
-
 ## Event Loop
+
+Dependencies:
+1. CommonAPIs::ThreadLocal::V1::ThreadLocalLinuxAPI
