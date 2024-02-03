@@ -16,7 +16,12 @@ will put the FD into the Ready list. System call epoll_wait() can be used to ret
 
 ![eventLoop1](../../assets/eventLoop.png?raw=true)
 
-![epoll](../../assets/epoll.png)
+![epoll](../../assets/epoll.png?raw=true)
+
+![epoll-eventloop](../../assets/epoll-eventloop.png?raw=true)
+
+An interesting example for epoll using with eventfd.
+![epoll](../../assets/epoll-eventfd.png?raw=true)
 
 ## References:
 1. [epoll](https://copyconstruct.medium.com/the-method-to-epolls-madness-d9d2d6378642)

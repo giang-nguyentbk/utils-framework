@@ -24,7 +24,7 @@ An Event Loop is basically an infinite loop continuously waiting for and dispatc
 within a program. Our Event Loop based on a well-known event driven architecture of Linux operating system,
 which is epoll.
 
-![eventLoop2](../../assets/eventLoopp.png?raw=true)
+![eventLoop2](./assets/eventLoopp.png?raw=true)
 
 
 ## Thread Local Linux
