@@ -16,7 +16,7 @@ to be performed based on priorities.
 // To implement Active Object we need Event Loop APIs, so pending for now after AO APIs have been done. Will continue
 after Event Loop APIs are ready to use.
 
-## Event Loop
+## [Event Loop](https://github.com/giang-nguyentbk/commonAPIs/tree/activeObject/sw/eventLoop)
 Dependencies:
 1. CommonAPIs::ThreadLocal::V1::ThreadLocalLinuxAPI
 
@@ -27,8 +27,10 @@ which is epoll.
 ![eventLoop2](./assets/eventLoopp.png?raw=true)
 
 
-## Thread Local Linux
+## [Thread Local Linux](https://github.com/giang-nguyentbk/commonAPIs/tree/activeObject/sw/threadLocal)
 As you know, threads in a same process should share one virtual address space. Therefore, if you have, for example,
 a global variable that is stored at a specific address. It can be easily modified by multiple threads in unpredictable
-ways. For some convinient purposes, we will want to have own data for each thread. And you can also manage those blocks
+ways.
+
+For some convinient purposes, we will want to have own data for each thread. And you can also manage those blocks
 of data via TLS keys (Thread Local Storage keys). One unique key is associated with one object allocated in the heap.
