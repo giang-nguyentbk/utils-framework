@@ -39,13 +39,13 @@ EventLoopImpl::EventLoopImpl()
 
 EventLoopImpl::~EventLoopImpl()
 {
-    if(-1 != m_epfd)
+    if(m_epfd != -1)
     {
         close(m_epfd);
     }
 }
 
-EventLoopAPI::ReturnCode EventLoopImpl::addFdHandler(int fd, uint32_t eventMask, const CallBackFunc& callback)
+EventLoopAPI::ReturnCode EventLoopImpl::addFdHandler(int fd, uint32_t eventMask, const CallbackFunc& callback)
 {
     // Check if current thread is thread local which owns this Event Loop instance
     if(m_threadId != std::this_thread::get_id())
@@ -80,9 +80,9 @@ EventLoopAPI::ReturnCode EventLoopImpl::addFdHandler(int fd, uint32_t eventMask,
 
     // If everything ok, create a pointer to a FdHandler object
     auto fdHandler = std::make_shared<FdHandler>();
-    fdHandler.fd = fd;
-    fdHandler.epollEvents = epollEvents;
-    fdHandler.callback = callback;
+    fdHandler->fd = fd;
+    fdHandler->epollEvents = epollEvents;
+    fdHandler->callback = callback;
 
     // Then create a standard struct epoll_event used by epoll
     /*  Definition from <sys/epoll.h>
@@ -171,7 +171,7 @@ EventLoopAPI::ReturnCode EventLoopImpl::removeFdHandler(int fd)
     }
 
     // Request epoll instance to delete the fd from the interest list.
-    (void) m_syscallWrapper->epoll_ctl(m_epfd, EPOLL_CTL_DEL, fd, nullptr)
+    (void) m_syscallWrapper->epoll_ctl(m_epfd, EPOLL_CTL_DEL, fd, nullptr);
 
     /*  Sometime, there could a not yet handled event for the removed FD in current batch
     *   Therefore, we will temporarily keep the corresponding FdHandler shared_ptr "alive" in our m_removedFdHandlers
@@ -179,7 +179,7 @@ EventLoopAPI::ReturnCode EventLoopImpl::removeFdHandler(int fd)
     *   But anyway, we set the event mask to 0 to avoid those event's callbacks being really executed.
     */
     fd_it->second->epollEvents = 0;
-    m_removedFdHandlers.emplace(fd, it->second);
+    m_removedFdHandlers.emplace(fd, fd_it->second);
 
     m_fdHandlers.erase(fd_it);
 
@@ -238,7 +238,7 @@ EventLoopAPI::ReturnCode EventLoopImpl::stop()
     return EventLoopAPI::ReturnCode::NORMAL;
 }
 
-void handEpollEvent(const struct epoll_event& event)
+void EventLoopImpl::handleEpollEvent(const struct epoll_event& event)
 {
     FdHandler* fdHandler = static_cast<FdHandler*>(event.data.ptr);
 
@@ -289,6 +289,23 @@ uint32_t EventLoopImpl::convertToLocalEvents(uint32_t epollEvents)
 void EventLoopImpl::dispatchEvent(const CallbackFunc& callback, int fd, uint32_t eventMask)
 {
     callback(fd, eventMask);
+}
+
+void EventLoopImpl::executeScheduledEvents()
+{
+    auto it = m_scheduledEvents.begin();
+
+    while(it != m_scheduledEvents.end())
+    {
+        auto eventHandler = *it;
+        m_scheduledEvents.erase(it);
+
+        eventHandler();
+
+        // Note that: be careful with an infinite loop of executeScheduledEvents(), which means somehow eventHandler()
+        // above repeatedly add new event(s).
+        it = m_scheduledEvents.begin();
+    }
 }
 
 EventLoopAPI::ReturnCode EventLoopImpl::scheduleEvent(const EventHandlerFunc& eventHandler)

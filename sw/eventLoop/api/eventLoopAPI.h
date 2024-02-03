@@ -77,7 +77,7 @@ public:
     /*! @brief Callback function signature used for handling an event on a FD.
     *   @param[in] fd The FD, a positive integer.
     *   @param[in] eventMask A bit-mask used for differentiating a FD readable only or writeable only or both rights. */
-    using CallBackFunc = std::function<void(int fd, uint32_t eventMask)>;
+    using CallbackFunc = std::function<void(int fd, uint32_t eventMask)>;
 
     /*! @brief Add an FD handler function to a FD with respective access rights via eventMask.
     *   @param[in] fd The FD, a positive integer.
@@ -86,7 +86,7 @@ public:
     *   @param[in] callback Function to be invoked when event occurs on a FD.
     *   @return NORMAL if successfully added, otherwise possible ReturnCode will be NOT_FOUND, INVALID_ARG,
     *   NOT_THREAD_LOCAL, INTERNAL_FAULT. */
-    virtual ReturnCode addFdHandler(int fd, uint32_t eventMask, const CallBackFunc& callback) = 0;
+    virtual ReturnCode addFdHandler(int fd, uint32_t eventMask, const CallbackFunc& callback) = 0;
 
     /*! @brief Update a FD handler with new eventMask (read/write/both)
     *   @param[in] fd The FD, a positive integer.
@@ -130,8 +130,8 @@ public:
 /****************************************************-SPECIAL-USE-*****************************************************/
 
 protected:
-    EventLoopAPI()  = delete;
-    ~EventLoopAPI() = delete;
+    EventLoopAPI()  = default;
+    ~EventLoopAPI() = default;
 
 }; // class EventLoopAPI
 

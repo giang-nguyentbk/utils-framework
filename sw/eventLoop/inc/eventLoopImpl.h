@@ -22,7 +22,7 @@ public:
     static EventLoopImpl& getInstance();
     static void reset();
 
-    ReturnCode addFdHandler(int fd, uint32_t eventMask, const CallBackFunc& callback) override;
+    ReturnCode addFdHandler(int fd, uint32_t eventMask, const CallbackFunc& callback) override;
     ReturnCode updateFdEvents(int fd, uint32_t eventMask) override;
     ReturnCode removeFdHandler(int fd) override;
     ReturnCode run() override;
@@ -39,8 +39,8 @@ public:
     EventLoopImpl& operator=(EventLoopImpl&&)         = delete;
 
 private:
-    void handEpollEvent(const struct epoll_event& event);
-    void dispatchEvent(const CallBackFunc& callback, int fd, uint32_t eventMask);
+    void handleEpollEvent(const struct epoll_event& event);
+    void dispatchEvent(const CallbackFunc& callback, int fd, uint32_t eventMask);
     void executeScheduledEvents();
 
     /*! @brief Because our local events are:
@@ -64,10 +64,10 @@ private:
     {
         int fd = -1;
         uint32_t epollEvents = 0;
-        CallBackFunc callback;
+        CallbackFunc callback;
     };
 
-    using FdHandlerMap = std::unordered_map<int /*fd*/, std::shared_ptr<FdHandler> /*fdHandler*/>;
+    using FdHandlerMap = std::unordered_map<int /* fd */, std::shared_ptr<FdHandler> /* fdHandler* */>;
     FdHandlerMap m_fdHandlers;
     FdHandlerMap m_removedFdHandlers;
 
