@@ -1,10 +1,10 @@
-# commonAPIs
+# utilsFramework
 
 
-## [Active Object](https://github.com/giang-nguyentbk/commonApis/tree/activeObject/sw/activeObject)
+## [Active Object](https://github.com/giang-nguyentbk/utilsFramework/tree/activeObject/sw/activeObject)
 Dependencies:
-1. CommonAPIs::EventLoop::V1::EventLoopAPI
-2. CommonAPIs::ThreadLocal::V1::ThreadLocalLinuxAPI
+1. UtilsFramework::EventLoop::V1::IEventLoop
+2. UtilsFramework::ThreadLocal::V1::IThreadLocal
 
 Let's think of an AO as a worker in which our main thread (client) wanted to do some functions asynchronously
 (without blocking main thread) and would then pass those functions to its AO which has an event queue of functions
@@ -16,9 +16,9 @@ to be performed based on priorities.
 // To implement Active Object we need Event Loop APIs, so pending for now after AO APIs have been done. Will continue
 after Event Loop APIs are ready to use.
 
-## [Event Loop](https://github.com/giang-nguyentbk/commonAPIs/tree/activeObject/sw/eventLoop)
+## [Event Loop](https://github.com/giang-nguyentbk/utilsFramework/tree/activeObject/sw/eventLoop)
 Dependencies:
-1. CommonAPIs::ThreadLocal::V1::ThreadLocalLinuxAPI
+1. UtilsFramework::ThreadLocal::V1::IThreadLocal
 
 An Event Loop is basically an infinite loop continuously waiting for and dispatching events or messages
 within a program. Our Event Loop based on a well-known event driven architecture of Linux operating system,
@@ -27,7 +27,7 @@ which is epoll.
 ![eventLoop2](./assets/eventLoopp.png?raw=true)
 
 
-## [Thread Local Linux](https://github.com/giang-nguyentbk/commonAPIs/tree/activeObject/sw/threadLocal)
+## [Thread Local Linux](https://github.com/giang-nguyentbk/utilsFramework/tree/activeObject/sw/threadLocal)
 As you know, threads in a same process should share one virtual address space. Therefore, if you have, for example,
 a global variable that is stored at a specific address. It can be easily modified by multiple threads in unpredictable
 ways.

@@ -1,10 +1,19 @@
+/*
+*        ________________           ________                                                    ______  
+* ____  ___  /___(_)__  /_______    ___  __/____________ _______ ___________      _________________  /__
+* _  / / /  __/_  /__  /__  ___/    __  /_ __  ___/  __ `/_  __ `__ \  _ \_ | /| / /  __ \_  ___/_  //_/
+* / /_/ // /_ _  / _  / _(__  )     _  __/ _  /   / /_/ /_  / / / / /  __/_ |/ |/ // /_/ /  /   _  ,<   
+* \__,_/ \__/ /_/  /_/  /____/      /_/    /_/    \__,_/ /_/ /_/ /_/\___/____/|__/ \____//_/    /_/|_|  
+*                                                                                                       
+*/
+
 #pragma once
 
 #include <memory>
 #include <functional>
 #include <string>
 
-namespace CommonAPIs
+namespace UtilsFramework
 {
 namespace ActiveObject 
 {
@@ -12,14 +21,14 @@ namespace V1
 {
 /*! @brief Active Objects (AO): Primarily used for managing internal tasks and encapsulating behavior within an object.
 * The focus is on providing a high-level abstraction for asynchronous task execution with its own thread of control.
-* Please use this CommonAPIs::ActiveObject::V1::ActiveObjectAPI along with CommonAPIs::EventLoop::V1::EventLoopApi and
-* CommonAPIs::ItcPubSub::V1::ItcPubSubApi.
+* Please use this UtilsFramework::ActiveObject::V1::IActiveObject along with UtilsFramework::EventLoop::V1::IEventLoop and
+* UtilsFramework::ItcPubSub::V1::ItcPubSubApi.
 *
 * Example usage:
 *
 * </code>
 *   // some your code ...
-*   std::shared_ptr<ActiveObjectAPI> ao = ActiveObjectAPI::create();
+*   std::shared_ptr<IActiveObject> ao = IActiveObject::create();
 *   if(!ao)
 *   {
 *         // print some error;
@@ -35,7 +44,7 @@ namespace V1
 * Note that: in asynchronous context, the function that is passed to AO must have void return type.
 */
 
-class ActiveObjectAPI
+class IActiveObject
 {
 public:
     /*! @brief Define Linux supported scheduling policies, see man7 pages for more information. Normally, we can simply
@@ -49,11 +58,11 @@ public:
 
     /*! @brief Creates a new Active Object for current calling thread.
     *   @param[in] initFunc A optional initialization function which is done before any other things are handled.
-    * For example, you can simply can ActiveObjectAPI::create() or utilize lamda expressions to pass initFunc to AO.
+    * For example, you can simply can IActiveObject::create() or utilize lamda expressions to pass initFunc to AO.
     * Usage:
     * 
     * </code>  
-    *   ActiveObjectAPI::create([var1, var2, obj1]() 
+    *   IActiveObject::create([var1, var2, obj1]() 
     *   {
     *       // do something here for initialization, for example create AO's mailboxes, doMonitorSomething(),...
     *   });
@@ -66,43 +75,30 @@ public:
     * shared pointer will be nullptr. You need to double check the return pointer before using. Once use_count
     * of shared pointer becomes zero, the AO thread will automatically terminated after all scheduled functions
     * in the event queue have been carried out. */
-    static std::shared_ptr<ActiveObjectAPI> create(const std::function<void()>& initFunc = nullptr, \
+    static std::shared_ptr<IActiveObject> create(const std::function<void()>& initFunc = nullptr, \
                                             const SchedulingPolicy& schedPolicy = SchedulingPolicy::Default);
 
-    /*! @brief Creates a new Active Object for current calling thread. Same as above except for giving the name
-    * of master thread for AO thread or AO's itc mailbox naming which is easier for debugging.
-    *   @param[in] name The name of master thread given to AO thread for naming, for example, AO_module1 where
-    * "module1" is the name of master thread (thread naming by prctrl syscall).
-    *   @param[in] initFunc A optional initialization function which is done before any other things are handled.
-    *   @param[in] schedPolicy Define Scheduling Policy for the AO. Scheduling::Default is selected by default.
-    *   @return Return a shared pointer to the created AO instance. If the creation fails for any reason, the returned
-    * shared pointer will be nullptr. You need to double check the return pointer before using. Once use_count
-    * of shared pointer becomes zero, the AO thread will automatically terminated after all scheduled functions
-    * in the event queue have been carried out. */
-    static std::shared_ptr<ActiveObjectAPI> create(const std::string& name, \
+    static std::shared_ptr<IActiveObject> create(const std::string& name, \
                                             const std::function<void()>& initFunc = nullptr, \
                                             const SchedulingPolicy& schedPolicy = SchedulingPolicy::Default);
 
-    /*! @brief Executes asynchronously a function which is given by master thread in the context of AO thread.
-    *   @param[in] func The function to be executed.
-    */
     virtual void executeFunction(const std::function<void()>& func = nullptr);
 
     // To avoid user doing copy/move operations
-    ActiveObjectAPI(const ActiveObjectAPI&) = delete;
-    ActiveObjectAPI(ActiveObjectAPI&&) = delete;
-    ActiveObjectAPI& operator=(const ActiveObjectAPI&) = delete;
-    ActiveObjectAPI& operator=(ActiveObjectAPI&&) = delete;
+    IActiveObject(const IActiveObject&) = delete;
+    IActiveObject(IActiveObject&&) = delete;
+    IActiveObject& operator=(const IActiveObject&) = delete;
+    IActiveObject& operator=(IActiveObject&&) = delete;
 
 protected:
     // Only backend implementation (behind the scene) can define constructor and destructor.
-    ActiveObjectAPI() = default;
-    ~ActiveObjectAPI() = default;
+    IActiveObject() = default;
+    ~IActiveObject() = default;
 
-}; // class ActiveObjectAPI
+}; // class IActiveObject
 
 } // namespace V1
 
 } // namespace ActiveObject
 
-} // namespace CommonAPIs
+} // namespace UtilsFramework

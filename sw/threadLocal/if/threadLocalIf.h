@@ -1,17 +1,26 @@
+/*
+*        ________________           ________                                                    ______  
+* ____  ___  /___(_)__  /_______    ___  __/____________ _______ ___________      _________________  /__
+* _  / / /  __/_  /__  /__  ___/    __  /_ __  ___/  __ `/_  __ `__ \  _ \_ | /| / /  __ \_  ___/_  //_/
+* / /_/ // /_ _  / _  / _(__  )     _  __/ _  /   / /_/ /_  / / / / /  __/_ |/ |/ // /_/ /  /   _  ,<   
+* \__,_/ \__/ /_/  /_/  /____/      /_/    /_/    \__,_/ /_/ /_/ /_/\___/____/|__/ \____//_/    /_/|_|  
+*                                                                                                       
+*/
+
 #pragma once
 
+#include <map>
 #include <assert.h>
 #include <pthread.h>
-#include <map>
 
-namespace CommonAPIs
+namespace UtilsFramework
 {
 namespace ThreadLocal
 {
 namespace V1
 {
-namespace implementation /* private stuff, do not use directly the classes inside this namespace.
-                            Use CommonAPIs::ThreadLocal::V1::ThreadLocalLinuxAPI instead */
+namespace implementation /* private namespace, do not use directly the classes inside this namespace.
+                            Use UtilsFramework::ThreadLocal::V1::IThreadLocal instead */
 {
 
 /*! @brief Thread Local Storage (TLS) is the mechanism by which each thread in a given multithreaded process
@@ -129,10 +138,10 @@ bool ThreadLocalLinuxImpl<T, instanceNum>::m_isKeyCreated = false;
 } // namespace implementation
 
 template <class T, int instanceNum = 1>
-using ThreadLocalLinuxAPI = implementation::ThreadLocalLinuxImpl<T, instanceNum>;
+using IThreadLocal = implementation::ThreadLocalLinuxImpl<T, instanceNum>;
 
 } // namespace V1
 
 } // namespace ThreadLocal
 
-} // namespace CommonAPIs
+} // namespace UtilsFramework

@@ -1,3 +1,12 @@
+/*
+*        ________________           ________                                                    ______  
+* ____  ___  /___(_)__  /_______    ___  __/____________ _______ ___________      _________________  /__
+* _  / / /  __/_  /__  /__  ___/    __  /_ __  ___/  __ `/_  __ `__ \  _ \_ | /| / /  __ \_  ___/_  //_/
+* / /_/ // /_ _  / _  / _(__  )     _  __/ _  /   / /_/ /_  / / / / /  __/_ |/ |/ // /_/ /  /   _  ,<   
+* \__,_/ \__/ /_/  /_/  /____/      /_/    /_/    \__,_/ /_/ /_/ /_/\___/____/|__/ \____//_/    /_/|_|  
+*                                                                                                       
+*/
+
 #pragma once
 
 #include <string>
@@ -6,10 +15,12 @@
 #include <functional>
 #include <vector>
 
-#include "eventLoopAPI.h"
+#include "eventLoopIf.h"
 
-namespace CommonAPIs::ActiveObject::implementation
+namespace UtilsFramework::ActiveObject::implementation
 {
+
+using namespace UtilsFramework::EventLoop::V1;
 
 class ActiveObjectThread
 {
@@ -24,26 +35,26 @@ public:
     ActiveObjectThread& operator=(const ActiveObjectThread&)    = delete;
     ActiveObjectThread& operator=(ActiveObjectThread&&)         = delete;
 
-    using AOFunction = std::function<void()>;
+    using AOFunc = std::function<void()>;
 
-    bool start(bool isFifo, const AOFunction& initFunc);
-    void scheduleFunction(const AOFunction& func);
+    bool start(bool isFifo, const AOFunc& initFunc);
+    void scheduleFunction(const AOFunc& func);
 
 private:
     static void mainFunction(const std::string& name, int eventFd, \
-                    const CommonAPIs::EventLoop::V1::EventLoopAPI::CallbackFunc& fdHandler, \
-                    bool isFifo, const AOFunction& initFunc);
+                    const IEventLoop::CallbackFunc& fdHandler, \
+                    bool isFifo, const AOFunc& initFunc);
 
     static void stopEventLoop(int eventFd);
-    void enqueueFunction(const AOFunction& func);
-    AOFunction dequeueFunction();
+    void enqueueFunction(const AOFunc& func);
+    AOFunc dequeueFunction();
     void handleFdEvent();
 
     std::string m_name;
     std::thread m_thread;
     int m_eventFd;
     std::mutex m_mutex;
-    std::vector<AOFunction> m_funcQueue;
+    std::vector<AOFunc> m_funcQueue;
 };
 
-} // namespace CommonAPIs::ActiveObject::implementation
+} // namespace UtilsFramework::ActiveObject::implementation
