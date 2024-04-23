@@ -1,3 +1,12 @@
+/*
+*        ________________           ________                                                    ______  
+* ____  ___  /___(_)__  /_______    ___  __/____________ _______ ___________      _________________  /__
+* _  / / /  __/_  /__  /__  ___/    __  /_ __  ___/  __ `/_  __ `__ \  _ \_ | /| / /  __ \_  ___/_  //_/
+* / /_/ // /_ _  / _  / _(__  )     _  __/ _  /   / /_/ /_  / / / / /  __/_ |/ |/ // /_/ /  /   _  ,<   
+* \__,_/ \__/ /_/  /_/  /____/      /_/    /_/    \__,_/ /_/ /_/ /_/\___/____/|__/ \____//_/    /_/|_|  
+*                                                                                                       
+*/
+
 #pragma once
 
 #include <unordered_map>
@@ -6,17 +15,17 @@
 #include <vector>
 #include <set>
 
-#include "eventLoopAPI.h"
+#include "eventLoopIf.h"
 #include "eventLoopSyscallWrapper.h"
 
-namespace CommonAPIs
+namespace UtilsFramework
 {
 namespace EventLoop
 {
 namespace V1
 {
 
-class EventLoopImpl : public EventLoopAPI
+class EventLoopImpl : public IEventLoop
 {
 public:
     static EventLoopImpl& getInstance();
@@ -48,7 +57,7 @@ private:
     *           + FdEventOut    = 0x002
     * While epol events defined in epoll.h are:
     *           + EPOLLIN       = 0x001
-    *           + EPOLLOUT      = 0x040
+    *           + EPOLLOUT      = 0x004
     * 
     * So we need to convert between them.
     */
@@ -79,4 +88,4 @@ private:
 
 } // namespace EventLoop
 
-} // namespace CommonAPIs
+} // namespace UtilsFramework

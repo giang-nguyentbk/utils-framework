@@ -13,7 +13,7 @@
         <mxCell id="ei8ZOMOiGoKKXpOmlXmw-3" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;Thread A&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#99FFCC;strokeWidth=0;" vertex="1" parent="1">
           <mxGeometry x="-60" y="95" width="90" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="ei8ZOMOiGoKKXpOmlXmw-4" value="&lt;span style=&quot;font-weight: normal;&quot;&gt;EventLoopAPI&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#99FFCC;strokeWidth=0;fontStyle=1" vertex="1" parent="1">
+        <mxCell id="ei8ZOMOiGoKKXpOmlXmw-4" value="&lt;span style=&quot;font-weight: normal;&quot;&gt;IEventLoop&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#99FFCC;strokeWidth=0;fontStyle=1" vertex="1" parent="1">
           <mxGeometry x="112.5" y="95" width="95" height="40" as="geometry" />
         </mxCell>
         <mxCell id="ei8ZOMOiGoKKXpOmlXmw-5" value="" style="endArrow=none;dashed=1;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeWidth=1;dashPattern=8 8;" edge="1" parent="1" source="ei8ZOMOiGoKKXpOmlXmw-21" target="ei8ZOMOiGoKKXpOmlXmw-3">
