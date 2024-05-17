@@ -156,7 +156,7 @@ void ItcPubSubImpl::handleFdEvent()
 			dispatchMsgHandler(it->second, itcMsg);
 		} else
 		{
-			std::cout << "\tDEBUG: handleFdEvent - Message handler for msgNo " << itcMsg->msgNo << " not found!" << std::endl;
+			std::cout << "\tDEBUG: handleFdEvent - Not found message handler for msgNo 0x" << std::hex << itcMsg->msgNo << " sent from \"" << getMboxName(itc_sender(itcMsg.get())) << "\" to our mailbox \"" << getMboxName(itc_current_mbox()) << "\"!" << std::endl;
 		}
 	}
 }
