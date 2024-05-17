@@ -16,9 +16,9 @@
 
 namespace UtilsFramework
 {
-namespace ActiveObject 
+namespace ActiveObject
 {
-namespace V1 
+namespace V1
 {
 using namespace UtilsFramework::ActiveObject::implementation;
 

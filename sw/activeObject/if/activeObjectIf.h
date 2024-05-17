@@ -15,9 +15,9 @@
 
 namespace UtilsFramework
 {
-namespace ActiveObject 
+namespace ActiveObject
 {
-namespace V1 
+namespace V1
 {
 /*! @brief Active Objects (AO): Primarily used for managing internal tasks and encapsulating behavior within an object.
 * The focus is on providing a high-level abstraction for asynchronous task execution with its own thread of control.
@@ -60,16 +60,16 @@ public:
     *   @param[in] initFunc A optional initialization function which is done before any other things are handled.
     * For example, you can simply can IActiveObject::create() or utilize lamda expressions to pass initFunc to AO.
     * Usage:
-    * 
-    * </code>  
-    *   IActiveObject::create([var1, var2, obj1]() 
+    *
+    * </code>
+    *   IActiveObject::create([var1, var2, obj1]()
     *   {
     *       // do something here for initialization, for example create AO's mailboxes, doMonitorSomething(),...
     *   });
     * </code>
-    * 
+    *
     * You can also give lamda access to variables in current context of main thread via Capture clause.
-    * Note that: no param in () and no return for lamda 
+    * Note that: no param in () and no return for lamda
     *   @param[in] schedPolicy Define Scheduling Policy for the AO. Scheduling::Default is selected by default.
     *   @return Return a shared pointer to the created AO instance. If the creation fails for any reason, the returned
     * shared pointer will be nullptr. You need to double check the return pointer before using. Once use_count
