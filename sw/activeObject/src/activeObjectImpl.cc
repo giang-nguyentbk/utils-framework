@@ -20,9 +20,9 @@ std::shared_ptr<IActiveObject> IActiveObject::create(const std::function<void()>
 std::shared_ptr<IActiveObject> IActiveObject::create(const std::string& name, const std::function<void()>& initFunc, const SchedulingPolicy& schedPolicy)
 {
 	auto ao = std::make_shared<ActiveObjectImpl>();
-	if(!ao->createThread(name, initFunc, schedPolicy))
+	if(!ao->createThread(name, schedPolicy, initFunc))
 	{
-		ao.reset(); // Reset shared_pointer to nullptr
+		ao.reset(); // Reset shared_ptr to nullptr
 	}
 
 	return ao;
