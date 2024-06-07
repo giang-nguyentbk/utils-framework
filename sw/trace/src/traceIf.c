@@ -9,6 +9,7 @@
 #include "traceIf.h"
 
 #define SIZE_OF_MSG		255
+#define SIZE_OF_LEVEL		7
 #define SIZE_OF_FILELINE	64
 #define SIZE_OF_TIMESTAMP	50
 #define SIZE_OF_THREADNAME	16 // System limitation, see prctl man page
@@ -21,13 +22,13 @@
 	By the way, using "inline" keyword for these LOG_MACRO_ZZ apparently has no effect! That's interesting as well!
 */
 
-void getTraceParams(const char *file, int line, char *fileline, char *timestamp, char *threadname, char *cpuid);
-void log_info(const char *file, int line, const char *msg);
-void log_error(const char *file, int line, const char *msg);
-void log_abn(const char *file, int line, const char *msg);
-void log_debug(const char *file, int line, const char *msg);
+void get_loglevel(int level, char *loglevel, char *msg);
+void get_fileline(const char *file, int line, char *fileline);
+void get_timestamp(char *timestamp);
+void get_threadname(char *threadname);
+void get_cpuid(char *cpuid);
 
-void TPT_TRACE_ZZ(const char *file, int line, int level, const char *format, ...)
+void tracepoint(const char *file, int line, int level, const char *format, ...)
 {
 	va_list args;
 	char msg[SIZE_OF_MSG];
@@ -35,87 +36,59 @@ void TPT_TRACE_ZZ(const char *file, int line, int level, const char *format, ...
 	vsnprintf(msg, SIZE_OF_MSG, format, args);
 	va_end(args);
 
+	char loglevel[SIZE_OF_LEVEL];
+	get_loglevel(level, loglevel, msg);
+
+	char fileline[SIZE_OF_FILELINE];
+	get_fileline(file, line, fileline);
+
+	char timestamp[SIZE_OF_TIMESTAMP];
+	get_timestamp(timestamp);
+
+	char threadname[SIZE_OF_THREADNAME];
+	get_threadname(threadname);
+
+	char cpuid[SIZE_OF_CPUID];
+	get_cpuid(cpuid);
+
+	fprintf(stdout, "%-30s %-7s %-11s { \"%s\", %s, \"-\", \"%s\" }\n", timestamp, loglevel, cpuid, threadname, fileline, msg);
+	fflush(stdout);
+}
+
+void get_loglevel(int level, char *loglevel, char *msg)
+{
 	switch (level)
 	{
 	case TRACE_INFO:
-		log_info(file, line, msg);
+		strcpy(loglevel, "INFO:");
 		break;
 
 	case TRACE_ERROR:
-		log_error(file, line, msg);
+		strcpy(loglevel, "ERROR:");
 		break;
 
 	case TRACE_ABN:
-		log_abn(file, line, msg);
+		strcpy(loglevel, "ABN:");
 		break;
 
 	case TRACE_DEBUG:
-		log_debug(file, line, msg);
+		strcpy(loglevel, "DEBUG:");
 		break;
 	
 	default:
+		strcpy(loglevel, "ERROR:");
 		snprintf(msg, SIZE_OF_MSG, "Invalid trace level = %d, use default ERROR trace to print this msg!", level);
-		log_error(file, line, msg);
 		break;
 	}
 }
 
-void log_info(const char *file, int line, const char *msg)
-{
-	char fileline[SIZE_OF_FILELINE];
-	char timestamp[SIZE_OF_TIMESTAMP];
-	char threadname[SIZE_OF_THREADNAME];
-	char cpuid_buffer[SIZE_OF_CPUID];
-
-	getTraceParams(file, line, fileline, timestamp, threadname, cpuid_buffer);
-
-	fprintf(stdout, "%-30s %-7s %-11s { \"%s\", %s, \"-\", \"%s\" }\n", timestamp, "INFO:", cpuid_buffer, threadname, fileline, msg);
-	fflush(stdout);
-}
-
-void log_error(const char *file, int line, const char *msg)
-{
-	char fileline[SIZE_OF_FILELINE];
-	char timestamp[SIZE_OF_TIMESTAMP];
-	char threadname[SIZE_OF_THREADNAME];
-	char cpuid_buffer[SIZE_OF_CPUID];
-
-	getTraceParams(file, line, fileline, timestamp, threadname, cpuid_buffer);
-
-	fprintf(stdout, "%-30s %-7s %-11s { \"%s\", %s, \"-\", \"%s\" }\n", timestamp, "ERROR:", cpuid_buffer, threadname, fileline, msg);
-	fflush(stdout);
-}
-
-void log_abn(const char *file, int line, const char *msg)
-{
-	char fileline[SIZE_OF_FILELINE];
-	char timestamp[SIZE_OF_TIMESTAMP];
-	char threadname[SIZE_OF_THREADNAME];
-	char cpuid_buffer[SIZE_OF_CPUID];
-
-	getTraceParams(file, line, fileline, timestamp, threadname, cpuid_buffer);
-
-	fprintf(stdout, "%-30s %-7s %-11s { \"%s\", %s, \"-\", \"%s\" }\n", timestamp, "ABN:", cpuid_buffer, threadname, fileline, msg);
-	fflush(stdout);
-}
-
-void log_debug(const char *file, int line, const char *msg)
-{
-	char fileline[SIZE_OF_FILELINE];
-	char timestamp[SIZE_OF_TIMESTAMP];
-	char threadname[SIZE_OF_THREADNAME];
-	char cpuid_buffer[SIZE_OF_CPUID];
-
-	getTraceParams(file, line, fileline, timestamp, threadname, cpuid_buffer);
-
-	fprintf(stdout, "%-30s %-7s %-11s { \"%s\", %s, \"-\", \"%s\" }\n", timestamp, "DEBUG:", cpuid_buffer, threadname, fileline, msg);
-	fflush(stdout);
-}
-
-void getTraceParams(const char *file, int line, char *fileline, char *timestamp, char *threadname, char *cpuid)
+void get_fileline(const char *file, int line, char *fileline)
 {
 	snprintf(fileline, SIZE_OF_FILELINE, "\"%s\", %d", file, line);
+}
 
+void get_timestamp(char *timestamp)
+{
 	timestamp[0] = '[';
 	struct timespec tv;
 	clock_gettime(CLOCK_REALTIME, &tv);
@@ -125,9 +98,15 @@ void getTraceParams(const char *file, int line, char *fileline, char *timestamp,
 	int ts_len = strlen(timestamp);
 	timestamp[ts_len] = ']';
 	timestamp[ts_len + 1] = '\0';
+}
 
+void get_threadname(char *threadname)
+{
 	prctl(PR_GET_NAME, threadname, SIZE_OF_THREADNAME);
+}
 
+void get_cpuid(char *cpuid)
+{
 	unsigned int cpu = 999;
 	getcpu(&cpu, NULL);
 	if(cpu != 999)
