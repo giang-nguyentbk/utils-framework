@@ -8,6 +8,12 @@
 
 #include "traceIf.h"
 
+#define SIZE_OF_MSG		255
+#define SIZE_OF_FILELINE	64
+#define SIZE_OF_TIMESTAMP	50
+#define SIZE_OF_THREADNAME	16 // System limitation, see prctl man page
+#define SIZE_OF_CPUID		12
+
 /*
 	From high-resolution time measurement, it's showed that using LOG_MACRO() only costs 200% overhead compared to original printf().
 	Using printf() consumes about 35-40 us while using LOG_MACRO(), it's 65-75 us. It's still in acceptable ranges, right? (-_-)
@@ -15,172 +21,126 @@
 	By the way, using "inline" keyword for these LOG_MACRO_ZZ apparently has no effect! That's interesting as well!
 */
 
-void LOG_INFO_ZZ(const char *file, int line, const char *format, ...)
+void getTraceParams(const char *file, int line, char *fileline, char *timestamp, char *threadname, char *cpuid);
+void log_info(const char *file, int line, const char *msg);
+void log_error(const char *file, int line, const char *msg);
+void log_abn(const char *file, int line, const char *msg);
+void log_debug(const char *file, int line, const char *msg);
+
+void TPT_TRACE_ZZ(const char *file, int line, int level, const char *format, ...)
 {
 	va_list args;
-	char buffer[256];
-
+	char msg[SIZE_OF_MSG];
 	va_start(args, format);
-	vsnprintf(buffer, sizeof(buffer), format, args);
+	vsnprintf(msg, SIZE_OF_MSG, format, args);
 	va_end(args);
 
-	char timestamp[50];
-	struct timespec tv;
-	clock_gettime(CLOCK_REALTIME, &tv);
-	struct tm *timePointerEnd = localtime(&tv.tv_sec);
-	size_t nbytes = strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", timePointerEnd);
-	snprintf(timestamp + nbytes, sizeof(timestamp) - nbytes, ".%.9ld", tv.tv_nsec);
+	switch (level)
+	{
+	case TRACE_INFO:
+		log_info(file, line, msg);
+		break;
 
-	char threadname[30];
-	threadname[0] = '\"';
-	prctl(PR_GET_NAME, &threadname[1], (30 - 2));
-	int len = strlen(threadname);
-	threadname[len] = '\"';
-	threadname[len + 1] = '\0';
+	case TRACE_ERROR:
+		log_error(file, line, msg);
+		break;
 
-	char fileline[64];
-	snprintf(fileline, 64, "%s:%d", file, line);
+	case TRACE_ABN:
+		log_abn(file, line, msg);
+		break;
 
-	char cpuid_buffer[5];
-	unsigned int cpuid = 999;
+	case TRACE_DEBUG:
+		log_debug(file, line, msg);
+		break;
 	
-	getcpu(&cpuid, NULL);
-	if(cpuid != 999)
-	{
-		sprintf(cpuid_buffer, "%d", cpuid);
-	} else
-	{
-		cpuid_buffer[0] = '-';
-		cpuid_buffer[1] = '\0';
+	default:
+		snprintf(msg, SIZE_OF_MSG, "Invalid trace level = %d, use default ERROR trace to print this msg!", level);
+		log_error(file, line, msg);
+		break;
 	}
+}
 
-	fprintf(stdout, "%-30s %-10s cpu=%-5s %-20s %-25s msg: %-s", timestamp, "INFO", cpuid_buffer, threadname, fileline, buffer);
+void log_info(const char *file, int line, const char *msg)
+{
+	char fileline[SIZE_OF_FILELINE];
+	char timestamp[SIZE_OF_TIMESTAMP];
+	char threadname[SIZE_OF_THREADNAME];
+	char cpuid_buffer[SIZE_OF_CPUID];
+
+	getTraceParams(file, line, fileline, timestamp, threadname, cpuid_buffer);
+
+	fprintf(stdout, "%-30s %-7s %-11s { \"%s\", %s, \"-\", \"%s\" }\n", timestamp, "INFO:", cpuid_buffer, threadname, fileline, msg);
 	fflush(stdout);
 }
 
-void LOG_ERROR_ZZ(const char *file, int line, const char *format, ...)
+void log_error(const char *file, int line, const char *msg)
 {
-	va_list args;
-	char buffer[256];
+	char fileline[SIZE_OF_FILELINE];
+	char timestamp[SIZE_OF_TIMESTAMP];
+	char threadname[SIZE_OF_THREADNAME];
+	char cpuid_buffer[SIZE_OF_CPUID];
 
-	va_start(args, format);
-	vsnprintf(buffer, sizeof(buffer), format, args);
-	va_end(args);
+	getTraceParams(file, line, fileline, timestamp, threadname, cpuid_buffer);
 
-	char timestamp[50];
+	fprintf(stdout, "%-30s %-7s %-11s { \"%s\", %s, \"-\", \"%s\" }\n", timestamp, "ERROR:", cpuid_buffer, threadname, fileline, msg);
+	fflush(stdout);
+}
+
+void log_abn(const char *file, int line, const char *msg)
+{
+	char fileline[SIZE_OF_FILELINE];
+	char timestamp[SIZE_OF_TIMESTAMP];
+	char threadname[SIZE_OF_THREADNAME];
+	char cpuid_buffer[SIZE_OF_CPUID];
+
+	getTraceParams(file, line, fileline, timestamp, threadname, cpuid_buffer);
+
+	fprintf(stdout, "%-30s %-7s %-11s { \"%s\", %s, \"-\", \"%s\" }\n", timestamp, "ABN:", cpuid_buffer, threadname, fileline, msg);
+	fflush(stdout);
+}
+
+void log_debug(const char *file, int line, const char *msg)
+{
+	char fileline[SIZE_OF_FILELINE];
+	char timestamp[SIZE_OF_TIMESTAMP];
+	char threadname[SIZE_OF_THREADNAME];
+	char cpuid_buffer[SIZE_OF_CPUID];
+
+	getTraceParams(file, line, fileline, timestamp, threadname, cpuid_buffer);
+
+	fprintf(stdout, "%-30s %-7s %-11s { \"%s\", %s, \"-\", \"%s\" }\n", timestamp, "DEBUG:", cpuid_buffer, threadname, fileline, msg);
+	fflush(stdout);
+}
+
+void getTraceParams(const char *file, int line, char *fileline, char *timestamp, char *threadname, char *cpuid)
+{
+	snprintf(fileline, SIZE_OF_FILELINE, "\"%s\", %d", file, line);
+
+	timestamp[0] = '[';
 	struct timespec tv;
 	clock_gettime(CLOCK_REALTIME, &tv);
 	struct tm *timePointerEnd = localtime(&tv.tv_sec);
-	size_t nbytes = strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", timePointerEnd);
-	snprintf(timestamp + nbytes, sizeof(timestamp) - nbytes, ".%.9ld", tv.tv_nsec);
+	size_t nbytes = strftime(timestamp + 1, SIZE_OF_TIMESTAMP - 2, "%Y-%m-%d %H:%M:%S", timePointerEnd);
+	snprintf(timestamp + 1 + nbytes, SIZE_OF_TIMESTAMP - 2 - nbytes, ".%.9ld", tv.tv_nsec);
+	int ts_len = strlen(timestamp);
+	timestamp[ts_len] = ']';
+	timestamp[ts_len + 1] = '\0';
 
-	char threadname[30];
-	threadname[0] = '\"';
-	prctl(PR_GET_NAME, &threadname[1], (30 - 2));
-	int len = strlen(threadname);
-	threadname[len] = '\"';
-	threadname[len + 1] = '\0';
+	prctl(PR_GET_NAME, threadname, SIZE_OF_THREADNAME);
 
-	char fileline[64];
-	snprintf(fileline, 64, "%s:%d", file, line);
-
-	char cpuid_buffer[5];
-	unsigned int cpuid = 999;
-	getcpu(&cpuid, NULL);
-	if(cpuid != 999)
+	unsigned int cpu = 999;
+	getcpu(&cpu, NULL);
+	if(cpu != 999)
 	{
-		sprintf(cpuid_buffer, "%d", cpuid);
+		if(cpu < 10)
+		{
+			sprintf(cpuid, "{ cpu  %d }", cpu);
+		} else
+		{
+			sprintf(cpuid, "{ cpu %d }", cpu);
+		}
 	} else
 	{
-		cpuid_buffer[0] = '-';
-		cpuid_buffer[1] = '\0';
+		strcpy(cpuid, "{ - }");
 	}
-
-	fprintf(stdout, "%-30s %-10s cpu=%-5s %-20s %-25s msg: %-s", timestamp, "ERROR", cpuid_buffer, threadname, fileline, buffer);
-	fflush(stdout);
 }
-
-void LOG_ABN_ZZ(const char *file, int line, const char *format, ...)
-{
-	va_list args;
-	char buffer[256];
-
-	va_start(args, format);
-	vsnprintf(buffer, sizeof(buffer), format, args);
-	va_end(args);
-
-	char timestamp[50];
-	struct timespec tv;
-	clock_gettime(CLOCK_REALTIME, &tv);
-	struct tm *timePointerEnd = localtime(&tv.tv_sec);
-	size_t nbytes = strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", timePointerEnd);
-	snprintf(timestamp + nbytes, sizeof(timestamp) - nbytes, ".%.9ld", tv.tv_nsec);
-
-	char threadname[30];
-	threadname[0] = '\"';
-	prctl(PR_GET_NAME, &threadname[1], (30 - 2));
-	int len = strlen(threadname);
-	threadname[len] = '\"';
-	threadname[len + 1] = '\0';
-
-	char fileline[64];
-	snprintf(fileline, 64, "%s:%d", file, line);
-
-	char cpuid_buffer[5];
-	unsigned int cpuid = 999;
-	getcpu(&cpuid, NULL);
-	if(cpuid != 999)
-	{
-		sprintf(cpuid_buffer, "%d", cpuid);
-	} else
-	{
-		cpuid_buffer[0] = '-';
-		cpuid_buffer[1] = '\0';
-	}
-
-	fprintf(stdout, "%-30s %-10s cpu=%-5s %-20s %-25s msg: %-s", timestamp, "ABN", cpuid_buffer, threadname, fileline, buffer);
-	fflush(stdout);
-}
-
-void LOG_DEBUG_ZZ(const char *file, int line, const char *format, ...)
-{
-	va_list args;
-	char buffer[256];
-
-	va_start(args, format);
-	vsnprintf(buffer, sizeof(buffer), format, args);
-	va_end(args);
-
-	char timestamp[30];
-	struct timespec tv;
-	clock_gettime(CLOCK_REALTIME, &tv);
-	struct tm *timePointerEnd = localtime(&tv.tv_sec);
-	size_t nbytes = strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", timePointerEnd);
-	snprintf(timestamp + nbytes, sizeof(timestamp) - nbytes, ".%.9ld", tv.tv_nsec);
-
-	char threadname[30];
-	threadname[0] = '\"';
-	prctl(PR_GET_NAME, &threadname[1], (30 - 2));
-	int len = strlen(threadname);
-	threadname[len] = '\"';
-	threadname[len + 1] = '\0';
-
-	char fileline[64];
-	snprintf(fileline, 64, "%s:%d", file, line);
-
-	char cpuid_buffer[5];
-	unsigned int cpuid = 999;
-	getcpu(&cpuid, NULL);
-	if(cpuid != 999)
-	{
-		sprintf(cpuid_buffer, "%d", cpuid);
-	} else
-	{
-		cpuid_buffer[0] = '-';
-		cpuid_buffer[1] = '\0';
-	}
-
-	fprintf(stdout, "%-30s %-10s cpu=%-5s %-20s %-25s msg: %-s", timestamp, "DEBUG", cpuid_buffer, threadname, fileline, buffer);
-	fflush(stdout);
-}
-
