@@ -1,5 +1,3 @@
-ROOT_DIR := $(shell git rev-parse --show-toplevel)
-
 # --------------------------------------------------
 # Call Makefiles for init setups and build database
 # --------------------------------------------------
@@ -8,7 +6,9 @@ include Makefile.config
 # --------------------------------------------------
 # Call Makefiles for modules of the project
 # --------------------------------------------------
-include $(SW_DIR)/trace/Makefile
+include $(SW_DIR)/threadLocal/Makefile
+include $(SW_DIR)/eventLoop/Makefile
+include $(SW_DIR)/itcPubSub/Makefile
 
 
 
@@ -19,4 +19,6 @@ rootMakefile:
 	@echo "sw/make/Makefile: Compilation $(PROJ_NAME) done!!! [OK]"
 
 clean:
-	$(UF_RMV) $(BIN_DIR)
+	@echo
+	@echo "  RMV \t\t $(BIN_DIR)"
+	@$(SELF_RMV) $(BIN_DIR)
