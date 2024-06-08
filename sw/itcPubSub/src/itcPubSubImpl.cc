@@ -1,4 +1,6 @@
+#include <iostream>
 #include <string>
+
 #include <itc.h>
 
 #include "threadLocalIf.h"
@@ -56,7 +58,7 @@ void ItcPubSubImpl::reset()
 
 ItcPubSubImpl::ItcPubSubImpl()
 	: m_threadId(std::this_thread::get_id()),
-	  m_mboxFd(-1);
+	  m_mboxFd(-1)
 {
 }
 
