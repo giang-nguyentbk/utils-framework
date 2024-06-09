@@ -9,6 +9,7 @@ include Makefile.config
 include $(SW_DIR)/threadLocal/Makefile
 include $(SW_DIR)/eventLoop/Makefile
 include $(SW_DIR)/itcPubSub/Makefile
+include $(SW_DIR)/activeObject/Makefile
 
 
 

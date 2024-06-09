@@ -1,7 +1,7 @@
 ITCPUBSUB_DIR		:= $(SW_DIR)/itcPubSub
 ITCPUBSUB_SRC_DIR	:= $(ITCPUBSUB_DIR)/src
 
-ITCPUBSUB_CXXFLAGS	:= -lpthread -L$(LIB_DIR) -leventloop -L$() -litc
+ITCPUBSUB_CXXFLAGS	:= -lpthread -L$(LIB_DIR) -leventloop -L$(SDK_LIB_DIR) -litc
 ITCPUBSUB_LIBAR	:= libitcpubsuba.a # Static libary
 ITCPUBSUB_LIBSO	:= libitcpubsub.so # Dynamic libary
 
