@@ -1,7 +1,7 @@
 # utilsFramework
 
 
-## [Active Object](https://github.com/giang-nguyentbk/utilsFramework/tree/activeObject/sw/activeObject)
+## [Active Object](https://github.com/giang-nguyentbk/utils-framework/tree/master/sw/activeObject)
 Dependencies:
 1. UtilsFramework::EventLoop::V1::IEventLoop
 2. UtilsFramework::ThreadLocal::V1::IThreadLocal
@@ -16,7 +16,7 @@ to be performed based on priorities.
 // To implement Active Object we need Event Loop APIs, so pending for now after AO APIs have been done. Will continue
 after Event Loop APIs are ready to use.
 
-## [Event Loop](https://github.com/giang-nguyentbk/utilsFramework/tree/activeObject/sw/eventLoop)
+## [Event Loop](https://github.com/giang-nguyentbk/utils-framework/tree/master/sw/eventLoop)
 Dependencies:
 1. UtilsFramework::ThreadLocal::V1::IThreadLocal
 
@@ -27,7 +27,7 @@ which is epoll.
 ![eventLoop2](./assets/eventLoopp.png?raw=true)
 
 
-## [Thread Local Linux](https://github.com/giang-nguyentbk/utilsFramework/tree/activeObject/sw/threadLocal)
+## [Thread Local Linux](https://github.com/giang-nguyentbk/utils-framework/tree/master/sw/threadLocal)
 As you know, threads in a same process should share one virtual address space. Therefore, if you have, for example,
 a global variable that is stored at a specific address. It can be easily modified by multiple threads in unpredictable
 ways.
