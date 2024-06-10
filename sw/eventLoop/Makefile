@@ -1,7 +1,7 @@
 EVENTLOOP_DIR		:= $(SW_DIR)/eventLoop
 EVENTLOOP_SRC_DIR	:= $(EVENTLOOP_DIR)/src
 
-EVENTLOOP_CXXFLAGS	:= -lpthread
+EVENTLOOP_CXXFLAGS	:= -lpthread -L$(SDK_LIB_DIR) -ltraceif
 EVENTLOOP_LIBAR	:= libeventloopa.a # Static libary
 EVENTLOOP_LIBSO	:= libeventloop.so # Dynamic libary
 
@@ -13,7 +13,8 @@ EVENTLOOP_OBJS	:= $(EVENTLOOP_SRCS:%.cc=$(OBJ_DIR)/%.o)
 EVENTLOOP_INCS	:= \
 		-I$(EVENTLOOP_DIR)/if \
 		-I$(EVENTLOOP_DIR)/inc \
-		-I$(SW_DIR)/threadLocal/if
+		-I$(SW_DIR)/threadLocal/if \
+		-I$(SDK_INC_DIR)
 
 all: $(EVENTLOOP_OBJS) $(LIB_DIR)/$(EVENTLOOP_LIBAR) $(LIB_DIR)/$(EVENTLOOP_LIBSO) install-header-files-eventloopif
 

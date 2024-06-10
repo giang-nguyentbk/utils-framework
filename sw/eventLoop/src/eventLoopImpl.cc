@@ -1,6 +1,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include <traceIf.h>
+
 #include "threadLocalIf.h"
 #include "eventLoopIf.h"
 #include "eventLoopImpl.h"
@@ -26,7 +28,7 @@ EventLoopImpl& EventLoopImpl::getInstance()
 
 void EventLoopImpl::reset()
 {
-	std::cout << "\tDEBUG: reset - Resetting Event Loop...!" << std::endl;
+	TPT_TRACE(TRACE_INFO, "Resetting Event Loop...");
     	IThreadLocal<EventLoopImpl>::reset();
 }
 
@@ -40,10 +42,10 @@ EventLoopImpl::EventLoopImpl() :
 
 EventLoopImpl::~EventLoopImpl()
 {
-	std::cout << "\tDEBUG: ~EventLoopImpl - ~EventLoopImpl is called!" << std::endl;
+	TPT_TRACE(TRACE_INFO, "~EventLoopImpl is called!");
 	if(m_epfd != -1)
 	{
-		std::cout << "\tDEBUG: ~EventLoopImpl - close m_epfd!" << std::endl;
+		TPT_TRACE(TRACE_INFO, "~EventLoopImpl - close m_epfd!");
 		close(m_epfd);
 	}
 }
@@ -53,7 +55,7 @@ IEventLoop::ReturnCode EventLoopImpl::addFdHandler(int fd, uint32_t eventMask, c
 	// Check if current thread is thread local which owns this Event Loop instance
 	if(m_threadId != std::this_thread::get_id())
 	{
-		std::cout << "\tDEBUG: addFdHandler - Not a thread local!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "addFdHandler - Not a thread local!");
 		return IEventLoop::ReturnCode::NOT_THREAD_LOCAL;
 	}
 
@@ -61,7 +63,7 @@ IEventLoop::ReturnCode EventLoopImpl::addFdHandler(int fd, uint32_t eventMask, c
 	auto fd_it = m_fdHandlers.find(fd);
 	if(fd_it != m_fdHandlers.end())
 	{
-		std::cout << "\tDEBUG: addFdHandler - FD " << fd_it->first << "'s handler already exists!" << std::endl;
+		TPT_TRACE(TRACE_ABN, "addFdHandler - FD %d handler already exists!", fd_it->first);
 		return IEventLoop::ReturnCode::ALREADY_EXISTS;
 	}
 
@@ -69,7 +71,7 @@ IEventLoop::ReturnCode EventLoopImpl::addFdHandler(int fd, uint32_t eventMask, c
 	uint32_t epollEvents = convertToEpollEvents(eventMask);
 	if(0 == epollEvents)
 	{
-		std::cout << "\tDEBUG: addFdHandler - Failed to convertToEpollEvents()!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "addFdHandler - Failed to convertToEpollEvents()!");
 		return IEventLoop::ReturnCode::INVALID_ARG;
 	}
 
@@ -77,11 +79,11 @@ IEventLoop::ReturnCode EventLoopImpl::addFdHandler(int fd, uint32_t eventMask, c
 	if(-1 == m_epfd)
 	{
 		// Use EPOLL_CLOEXEC flag to avoid potential race condition in multithreaded application
-		std::cout << "\tDEBUG: addFdHandler - m_epfd hasn't been created yet, create it!" << std::endl;
+		TPT_TRACE(TRACE_INFO, "addFdHandler - m_epfd hasn't been created yet, create it!");
 		m_epfd = m_syscallWrapper->epoll_create1(EPOLL_CLOEXEC);
 		if(-1 == m_epfd)
 		{
-			std::cout << "\tDEBUG: addFdHandler - Failed to epoll_create() m_epfd!" << std::endl;
+			TPT_TRACE(TRACE_ERROR, "addFdHandler - Failed to epoll_create() m_epfd!");
 		return IEventLoop::ReturnCode::INTERNAL_FAULT;
 		}
 	}
@@ -116,14 +118,14 @@ IEventLoop::ReturnCode EventLoopImpl::addFdHandler(int fd, uint32_t eventMask, c
 	// Add a FD to the interest list of epoll instance which is referred by m_epfd
 	if(m_syscallWrapper->epoll_ctl(m_epfd, EPOLL_CTL_ADD, fd, &epEvent) == -1)
 	{
-		std::cout << "\tDEBUG: addFdHandler - Failed to epoll_ctl() with EPOLL_CTL_ADD for FD " << fd << std::endl;
+		TPT_TRACE(TRACE_ERROR, "addFdHandler - Failed to epoll_ctl() with EPOLL_CTL_ADD for FD %d", fd);
 		return IEventLoop::ReturnCode::INTERNAL_FAULT;
 	}
 
 	// Also add to our map for self management
 	m_fdHandlers.emplace(fd, fdHandler);
 
-	std::cout << "\tDEBUG: addFdHandler - Added FD " << fd << " handler successfully!" << std::endl;
+	TPT_TRACE(TRACE_INFO, "addFdHandler - Added FD %d handler successfully!", fd);
 	return IEventLoop::ReturnCode::NORMAL;
 }
 
@@ -132,7 +134,7 @@ IEventLoop::ReturnCode EventLoopImpl::updateFdEvents(int fd, uint32_t eventMask)
 	// Check if current thread is thread local which owns this Event Loop instance
 	if(m_threadId != std::this_thread::get_id())
 	{
-		std::cout << "\tDEBUG: updateFdEvents - Not a thread local!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "updateFdEvents - Not a thread local!");
 		return IEventLoop::ReturnCode::NOT_THREAD_LOCAL;
 	}
 
@@ -140,7 +142,7 @@ IEventLoop::ReturnCode EventLoopImpl::updateFdEvents(int fd, uint32_t eventMask)
 	auto fd_it = m_fdHandlers.find(fd);
 	if(fd_it == m_fdHandlers.end())
 	{
-		std::cout << "\tDEBUG: updateFdEvents - FD " << fd << " not found!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "updateFdEvents - FD %d not found!", fd);
 		return IEventLoop::ReturnCode::NOT_FOUND;
 	}
 
@@ -148,7 +150,7 @@ IEventLoop::ReturnCode EventLoopImpl::updateFdEvents(int fd, uint32_t eventMask)
 	uint32_t epollEvents = convertToEpollEvents(eventMask);
 	if(0 == epollEvents)
 	{
-		std::cout << "\tDEBUG: updateFdEvents - Failed to convertToEpollEvents()!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "updateFdEvents - Failed to convertToEpollEvents()!");
 		return IEventLoop::ReturnCode::INVALID_ARG;
 	}
 
@@ -160,11 +162,11 @@ IEventLoop::ReturnCode EventLoopImpl::updateFdEvents(int fd, uint32_t eventMask)
 	epEvent.data.ptr = fd_it->second.get();
 	if(m_syscallWrapper->epoll_ctl(m_epfd, EPOLL_CTL_MOD, fd, &epEvent) == -1)
 	{
-		std::cout << "\tDEBUG: updateFdEvents - Failed to epoll_ctl() with EPOLL_CTL_MOD for FD " << fd << std::endl;
+		TPT_TRACE(TRACE_ERROR, "updateFdEvents - Failed to epoll_ctl() with EPOLL_CTL_MOD for FD %d", fd);
 		return IEventLoop::ReturnCode::INTERNAL_FAULT;
 	}
 
-	std::cout << "\tDEBUG: updateFdEvents - Modified FD " << fd << "'s handler successfully!" << std::endl;
+	TPT_TRACE(TRACE_INFO, "updateFdEvents - Modified FD %d handler successfully!", fd);
 	return IEventLoop::ReturnCode::NORMAL;
 }
 
@@ -173,7 +175,7 @@ IEventLoop::ReturnCode EventLoopImpl::removeFdHandler(int fd)
 	// Check if current thread is thread local which owns this Event Loop instance
 	if(m_threadId != std::this_thread::get_id())
 	{
-		std::cout << "\tDEBUG: removeFdHandler - Not a thread local!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "removeFdHandler - Not a thread local!");
 		return IEventLoop::ReturnCode::NOT_THREAD_LOCAL;
 	}
 
@@ -181,7 +183,7 @@ IEventLoop::ReturnCode EventLoopImpl::removeFdHandler(int fd)
 	auto fd_it = m_fdHandlers.find(fd);
 	if(fd_it == m_fdHandlers.end())
 	{
-		std::cout << "\tDEBUG: removeFdHandler - FD " << fd << " not found!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "removeFdHandler - FD %d not found!", fd);
 		return IEventLoop::ReturnCode::NOT_FOUND;
 	}
 
@@ -198,7 +200,7 @@ IEventLoop::ReturnCode EventLoopImpl::removeFdHandler(int fd)
 
 	m_fdHandlers.erase(fd_it);
 
-	std::cout << "\tDEBUG: removeFdHandler - Removed FD " << fd << "'s handler successfully!" << std::endl;
+	TPT_TRACE(TRACE_INFO, "removeFdHandler - Removed FD %d handler successfully!", fd);
 	return IEventLoop::ReturnCode::NORMAL;
 }
 
@@ -207,11 +209,11 @@ IEventLoop::ReturnCode EventLoopImpl::run()
 	// Check if current thread is thread local which owns this Event Loop instance
 	if(m_threadId != std::this_thread::get_id())
 	{
-		std::cout << "\tDEBUG: run - Not a thread local!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "run - Not a thread local!");
 		return IEventLoop::ReturnCode::NOT_THREAD_LOCAL;
 	}
 
-	std::cout << "\tDEBUG: run - Starting Event Loop...!" << std::endl;
+	TPT_TRACE(TRACE_INFO, "run - Starting Event Loop...");
 	m_isRunning = true;
 
 	const int maxEvents = 3;
@@ -229,14 +231,14 @@ IEventLoop::ReturnCode EventLoopImpl::run()
 
 		if(eventCount > 0)
 		{
-			std::cout << "\tDEBUG: run - Current batch: num events: "  << eventCount << std::endl;
+			TPT_TRACE(TRACE_INFO, "run - Current batch: num events: %d", eventCount);
 			for(int i = 0; i < eventCount; ++i)
 			{
 				handleEpollEvent(events[i]);
 			}	
 		} else if (eventCount == -1 && errno != EINTR)
 		{
-			std::cout << "\tDEBUG: run - Failed to epoll_wait()" << std::endl;
+			TPT_TRACE(TRACE_ERROR, "run - Failed to epoll_wait()");
 			return IEventLoop::ReturnCode::INTERNAL_FAULT;
 		}
 	}
@@ -249,13 +251,13 @@ IEventLoop::ReturnCode EventLoopImpl::stop()
 	// Check if current thread is thread local which owns this Event Loop instance
 	if(m_threadId != std::this_thread::get_id())
 	{
-		std::cout << "\tDEBUG: stop - Not a thread local!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "stop - Not a thread local!");
 		return IEventLoop::ReturnCode::NOT_THREAD_LOCAL;
 	}
 
 	m_isRunning = false;
 
-	std::cout << "\tDEBUG: stop - Exiting Event Loop...!" << std::endl;
+	TPT_TRACE(TRACE_INFO, "stop - Exiting Event Loop...");
 	return IEventLoop::ReturnCode::NORMAL;
 }
 
@@ -265,7 +267,7 @@ void EventLoopImpl::handleEpollEvent(const struct epoll_event& event)
 
 	uint32_t eventMask = convertToLocalEvents(event.events & fdHandler->epollEvents);
 	// For removed FDs, eventMask = 0, so those FD's callbacks will be skipped
-	std::cout << "\tDEBUG: handleEpollEvent - event = " << +event.events << " eventMask = " << +eventMask << std::endl;
+	TPT_TRACE(TRACE_INFO, "handleEpollEvent - event = %d, eventMask = %d", +event.events, +eventMask);
 	if(eventMask)
 	{
 		dispatchEvent(fdHandler->callback, fdHandler->fd, eventMask);
@@ -288,7 +290,7 @@ uint32_t EventLoopImpl::convertToEpollEvents(uint32_t localEvents)
 		epollEvents |= EPOLLOUT;
 	}
 
-	std::cout << "\tDEBUG: convertToEpollEvents - localEvents = " << +localEvents << ", epollEvents = " << +epollEvents << std::endl;
+	TPT_TRACE(TRACE_INFO, "convertToEpollEvents - localEvents = %d, epollEvents = %d", +localEvents, +epollEvents);
 	return epollEvents;
 }
 
@@ -306,13 +308,13 @@ uint32_t EventLoopImpl::convertToLocalEvents(uint32_t epollEvents)
 		localEvents |= FdEventOut;
 	}
 
-	std::cout << "\tDEBUG: convertToEpollEvents - epollEvents = " << +epollEvents << ", localEvents = " << +localEvents << std::endl;
+	TPT_TRACE(TRACE_INFO, "convertToLocalEvents - epollEvents = %d, localEvents = %d", +epollEvents, +localEvents);
 	return localEvents;
 }
 
 void EventLoopImpl::dispatchEvent(const CallbackFunc& callback, int fd, uint32_t eventMask)
 {
-	std::cout << "\tDEBUG: dispatchEvent - Executing callback for fd " << fd << std::endl;
+	TPT_TRACE(TRACE_INFO, "dispatchEvent - Invoking callback for fd  %d", fd);
     	callback(fd, eventMask);
 }
 
@@ -320,13 +322,13 @@ void EventLoopImpl::executeScheduledEvents()
 {
 	auto it = m_scheduledEvents.begin();
 
-	std::cout << "\tDEBUG: executeScheduledEvents - m_scheduledEvents size = " << m_scheduledEvents.size() << std::endl;
+	TPT_TRACE(TRACE_INFO, "executeScheduledEvents - m_scheduledEvents size = %d", m_scheduledEvents.size());
 	while(it != m_scheduledEvents.end())
 	{
 		auto eventHandler = *it;
 		m_scheduledEvents.erase(it);
 
-		std::cout << "\tDEBUG: executeScheduledEvents - Executing eventHandler()!" << std::endl;
+		TPT_TRACE(TRACE_INFO, "executeScheduledEvents - Invoking eventHandler()!");
 		eventHandler();
 
 		// Note that: be careful with an infinite loop of executeScheduledEvents(), which means somehow eventHandler()
@@ -340,13 +342,13 @@ IEventLoop::ReturnCode EventLoopImpl::scheduleEvent(const EventHandlerFunc& even
 	// Check if current thread is thread local which owns this Event Loop instance
 	if(m_threadId != std::this_thread::get_id())
 	{
-		std::cout << "\tDEBUG: scheduleEvent - Not a thread local!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "scheduleEvent - Not a thread local!");
 		return IEventLoop::ReturnCode::NOT_THREAD_LOCAL;
 	}
 
 	m_scheduledEvents.push_back(eventHandler);
 
-	std::cout << "\tDEBUG: scheduleEvent - Scheduled a new eventHandler to m_scheduledEvents successfully!" << std::endl;
+	TPT_TRACE(TRACE_INFO, "scheduleEvent - Scheduled a new eventHandler to m_scheduledEvents successfully!");
 	return IEventLoop::ReturnCode::NORMAL;
 }
 

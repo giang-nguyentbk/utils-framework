@@ -2,6 +2,7 @@
 #include <string>
 
 #include <itc.h>
+#include <traceIf.h>
 
 #include "threadLocalIf.h"
 #include "eventLoopIf.h"
@@ -74,13 +75,13 @@ IItcPubSub::ReturnCode ItcPubSubImpl::addItcFd(int fd)
 {
 	if(std::this_thread::get_id() != m_threadId)
 	{
-		std::cout << "\tDEBUG: addItcFd - Not a thread local!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "addItcFd - Not a thread local!");
 		return IItcPubSub::ReturnCode::NOT_THREAD_LOCAL;
 	}
 
 	if(m_mboxFd != -1)
 	{
-		std::cout << "\tDEBUG: addItcFd - Mailbox FD " << fd << " already exists!" << std::endl;
+		TPT_TRACE(TRACE_ABN, "addItcFd - FD %d handler already exists!", fd);
 		return IItcPubSub::ReturnCode::ALREADY_EXISTS;
 	}
 
@@ -88,13 +89,13 @@ IItcPubSub::ReturnCode ItcPubSubImpl::addItcFd(int fd)
 
 	if(IEventLoop::getInstance().addFdHandler(fd, IEventLoop::FdEventIn, callback) != IEventLoop::ReturnCode::NORMAL)
 	{
-		std::cout << "\tDEBUG: addItcFd - Failed to IEventLoop::addFdHandler()!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "addItcFd - Failed to IEventLoop::addFdHandler()!");
 		return IItcPubSub::ReturnCode::INTERNAL_FAULT;
 	}
 
 	m_mboxFd = fd;
 
-	std::cout << "\tDEBUG: addItcFd - Added Mailbox FD " << fd << " successfully!" << std::endl;
+	TPT_TRACE(TRACE_INFO, "addItcFd - Added Mailbox FD %d successfully!", fd);
 	return IItcPubSub::ReturnCode::NORMAL;
 }
 
@@ -102,20 +103,20 @@ IItcPubSub::ReturnCode ItcPubSubImpl::registerMsg(uint32_t msgNo, const MsgHandl
 {
 	if(std::this_thread::get_id() != m_threadId)
 	{
-		std::cout << "\tDEBUG: registerMsg - Not a thread local!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "registerMsg - Not a thread local!");
 		return IItcPubSub::ReturnCode::NOT_THREAD_LOCAL;
 	}
 
 	auto it = m_msgHandlerMap.find(msgNo);
 	if(it != m_msgHandlerMap.end())
 	{
-		std::cout << "\tDEBUG: registerMsg - Message number " << msgNo << " already exists!" << std::endl;
+		TPT_TRACE(TRACE_ABN, "registerMsg - Message number 0x%08x already registered!", msgNo);
 		return IItcPubSub::ReturnCode::ALREADY_EXISTS;
 	}
 
 	m_msgHandlerMap.emplace(msgNo, msgHandler);
 
-	std::cout << "\tDEBUG: registerMsg - Registered message number " << msgNo << " successfully!" << std::endl;
+	TPT_TRACE(TRACE_INFO, "registerMsg - Registered message number 0x%08x successfully!", msgNo);
 	return IItcPubSub::ReturnCode::NORMAL;
 }
 
@@ -123,20 +124,20 @@ IItcPubSub::ReturnCode ItcPubSubImpl::deregisterMsg(uint32_t msgNo)
 {
 	if(std::this_thread::get_id() != m_threadId)
 	{
-		std::cout << "\tDEBUG: deregisterMsg - Not a thread local!" << std::endl;
+		TPT_TRACE(TRACE_ERROR, "deregisterMsg - Not a thread local!");
 		return IItcPubSub::ReturnCode::NOT_THREAD_LOCAL;
 	}
 
 	auto it = m_msgHandlerMap.find(msgNo);
 	if(it == m_msgHandlerMap.end())
 	{
-		std::cout << "\tDEBUG: deregisterMsg - Message number " << msgNo << " not found!" << std::endl;
+		TPT_TRACE(TRACE_ABN, "deregisterMsg - Message number 0x%08x not found!", msgNo);
 		return IItcPubSub::ReturnCode::NOT_FOUND;
 	}
 
 	m_msgHandlerMap.erase(it);
 
-	std::cout << "\tDEBUG: registerMsg - Deregistered message number " << msgNo << " successfully!" << std::endl;
+	TPT_TRACE(TRACE_INFO, "deregisterMsg - Deregistered message number 0x%08x successfully!", msgNo);
 	return IItcPubSub::ReturnCode::NORMAL;
 }
 
@@ -158,7 +159,7 @@ void ItcPubSubImpl::handleFdEvent()
 			dispatchMsgHandler(it->second, itcMsg);
 		} else
 		{
-			std::cout << "\tDEBUG: handleFdEvent - Not found message handler for msgNo 0x" << std::hex << itcMsg->msgNo << " sent from \"" << getMboxName(itc_sender(itcMsg.get())) << "\" to our mailbox \"" << getMboxName(itc_current_mbox()) << "\"!" << std::endl;
+			TPT_TRACE(TRACE_ABN, "handleFdEvent - No message handler found for msgNo 0x%08x sent from \"%s\" to our mailbox \"%s\"!", itcMsg->msgNo, getMboxName(itc_sender(itcMsg.get())).c_str(), getMboxName(itc_current_mbox()).c_str());
 		}
 	}
 }
