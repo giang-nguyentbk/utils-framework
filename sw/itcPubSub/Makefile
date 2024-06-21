@@ -2,20 +2,20 @@ ITCPUBSUB_DIR		:= $(SW_DIR)/itcPubSub
 ITCPUBSUB_SRC_DIR	:= $(ITCPUBSUB_DIR)/src
 
 ITCPUBSUB_CXXFLAGS	:= -lpthread -L$(LIB_DIR) -leventloop -L$(SDK_LIB_DIR) -litc -ltraceif
-ITCPUBSUB_LIBAR	:= libitcpubsuba.a # Static libary
-ITCPUBSUB_LIBSO	:= libitcpubsub.so # Dynamic libary
+ITCPUBSUB_LIBAR		:= libitcpubsuba.a # Static libary
+ITCPUBSUB_LIBSO		:= libitcpubsub.so # Dynamic libary
 
-ITCPUBSUB_SRCS	=
-ITCPUBSUB_SRCS	+= itcPubSubImpl.cc
+ITCPUBSUB_SRCS		=
+ITCPUBSUB_SRCS		+= itcPubSubImpl.cc
 
-ITCPUBSUB_OBJS	:= $(ITCPUBSUB_SRCS:%.cc=$(OBJ_DIR)/%.o)
+ITCPUBSUB_OBJS		:= $(ITCPUBSUB_SRCS:%.cc=$(OBJ_DIR)/%.o)
 
-ITCPUBSUB_INCS	:= \
-		-I$(ITCPUBSUB_DIR)/if \
-		-I$(ITCPUBSUB_DIR)/inc \
-		-I$(SW_DIR)/threadLocal/if \
-		-I$(SW_DIR)/eventLoop/if \
-		-I$(SDK_INC_DIR)
+ITCPUBSUB_INCS		:= \
+			-I$(ITCPUBSUB_DIR)/if \
+			-I$(ITCPUBSUB_DIR)/inc \
+			-I$(SW_DIR)/threadLocal/if \
+			-I$(SW_DIR)/eventLoop/if \
+			-I$(SDK_INC_DIR)
 
 all: $(ITCPUBSUB_OBJS) $(LIB_DIR)/$(ITCPUBSUB_LIBAR) $(LIB_DIR)/$(ITCPUBSUB_LIBSO) install-header-files-itcpubsubif
 
