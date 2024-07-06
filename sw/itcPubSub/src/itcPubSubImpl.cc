@@ -2,6 +2,7 @@
 #include <string>
 
 #include <itc.h>
+#include "util_framework_tpt_provider.h"
 #include <traceIf.h>
 
 #include "threadLocalIf.h"

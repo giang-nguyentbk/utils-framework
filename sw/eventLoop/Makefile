@@ -14,6 +14,7 @@ EVENTLOOP_INCS	:= \
 		-I$(EVENTLOOP_DIR)/if \
 		-I$(EVENTLOOP_DIR)/inc \
 		-I$(SW_DIR)/threadLocal/if \
+		-I$(SW_DIR)/common \
 		-I$(SDK_INC_DIR)
 
 all: $(EVENTLOOP_OBJS) $(LIB_DIR)/$(EVENTLOOP_LIBAR) $(LIB_DIR)/$(EVENTLOOP_LIBSO) install-header-files-eventloopif

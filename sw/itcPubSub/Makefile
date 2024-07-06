@@ -15,6 +15,7 @@ ITCPUBSUB_INCS		:= \
 			-I$(ITCPUBSUB_DIR)/inc \
 			-I$(SW_DIR)/threadLocal/if \
 			-I$(SW_DIR)/eventLoop/if \
+			-I$(SW_DIR)/common \
 			-I$(SDK_INC_DIR)
 
 all: $(ITCPUBSUB_OBJS) $(LIB_DIR)/$(ITCPUBSUB_LIBAR) $(LIB_DIR)/$(ITCPUBSUB_LIBSO) install-header-files-itcpubsubif
