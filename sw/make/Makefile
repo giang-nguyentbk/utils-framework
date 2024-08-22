@@ -11,6 +11,7 @@ include $(SW_DIR)/eventLoop/Makefile
 include $(SW_DIR)/itcPubSub/Makefile
 include $(SW_DIR)/activeObject/Makefile
 include $(SW_DIR)/timer/Makefile
+include $(SW_DIR)/startup/Makefile
 
 
 
