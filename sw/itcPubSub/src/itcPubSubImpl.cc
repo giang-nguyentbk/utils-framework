@@ -46,12 +46,12 @@ namespace V1
 using namespace UtilsFramework::ThreadLocal::V1;
 using namespace UtilsFramework::EventLoop::V1;
 
-IItcPubSub& IItcPubSub::getInstance()
+IItcPubSub& IItcPubSub::getThreadLocalInstance()
 {
-	return ItcPubSubImpl::getInstance();
+	return ItcPubSubImpl::getThreadLocalInstance();
 }
 
-ItcPubSubImpl& ItcPubSubImpl::getInstance()
+ItcPubSubImpl& ItcPubSubImpl::getThreadLocalInstance()
 {
 	return IThreadLocal<ItcPubSubImpl>::get();
 }
@@ -71,7 +71,7 @@ ItcPubSubImpl::~ItcPubSubImpl()
 {
 	if(m_mboxFd != -1)
 	{
-		(void)IEventLoop::getInstance().removeFdHandler(m_mboxFd);
+		(void)IEventLoop::getThreadLocalInstance().removeFdHandler(m_mboxFd);
 	}
 }
 
@@ -91,7 +91,7 @@ IItcPubSub::ReturnCode ItcPubSubImpl::addItcFd(int fd)
 
 	auto callback = std::bind(&ItcPubSubImpl::handleFdEvent, this);
 
-	if(IEventLoop::getInstance().addFdHandler(fd, IEventLoop::FdEventIn, callback) != IEventLoop::ReturnCode::NORMAL)
+	if(IEventLoop::getThreadLocalInstance().addFdHandler(fd, IEventLoop::FdEventIn, callback) != IEventLoop::ReturnCode::NORMAL)
 	{
 		TPT_TRACE(TRACE_ERROR, SSTR("addItcFd - Failed to IEventLoop::addFdHandler()!"));
 		return IItcPubSub::ReturnCode::INTERNAL_FAULT;

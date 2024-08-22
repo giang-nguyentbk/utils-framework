@@ -6,7 +6,7 @@ using namespace UtilsFramework::EventLoop::V1;
 
 int main()
 {
-	IEventLoop& eventLoop = IEventLoop::getInstance();
+	IEventLoop& eventLoop = IEventLoop::getThreadLocalInstance();
 
 	int fd = eventfd(0, EFD_CLOEXEC);
 	uint32_t eventMask = IEventLoop::FdEventIn;

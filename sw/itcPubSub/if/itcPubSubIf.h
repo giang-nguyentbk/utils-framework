@@ -35,8 +35,8 @@ namespace V1
 *   	{
 *       	... 
 *
-*       	IItcPubSub& itcPubSub = IItcPubSub::getInstance();
-*       	IItcPubSub& eventLoop = IItcPubSub::getInstance();
+*       	IItcPubSub& itcPubSub = IItcPubSub::getThreadLocalInstance();
+*       	IItcPubSub& eventLoop = IItcPubSub::getThreadLocalInstance();
 *
 *		// Add your thread's mailbox FD to ItcPubSub where registered messages will be monitored
 *		if(itcPubSub.addItcFd(itc_get_fd()) != IItcPubSub::ReturnCode::NORMAL)
@@ -75,7 +75,7 @@ public:
 	IItcPubSub& operator=(const IItcPubSub&)    = delete; // Copy assignment constructor
 	IItcPubSub& operator=(IItcPubSub&&)         = delete; // Move assignment constructor
 
-	static IItcPubSub& getInstance();
+	static IItcPubSub& getThreadLocalInstance();
 
 	using MsgHandler = std::function<void(const std::shared_ptr<union itc_msg>& msg)>;
 

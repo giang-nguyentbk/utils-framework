@@ -19,12 +19,12 @@ namespace EventLoop
 namespace V1
 {
 
-IEventLoop& IEventLoop::getInstance()
+IEventLoop& IEventLoop::getThreadLocalInstance()
 {
-    	return EventLoopImpl::getInstance();
+    	return EventLoopImpl::getThreadLocalInstance();
 }
 
-EventLoopImpl& EventLoopImpl::getInstance()
+EventLoopImpl& EventLoopImpl::getThreadLocalInstance()
 {
     	return IThreadLocal<EventLoopImpl>::get();
 }

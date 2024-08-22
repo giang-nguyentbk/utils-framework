@@ -28,7 +28,7 @@ namespace V1
 class EventLoopImpl : public IEventLoop
 {
 public:
-	static EventLoopImpl& getInstance();
+	static EventLoopImpl& getThreadLocalInstance();
 	static void reset();
 
 	ReturnCode addFdHandler(int fd, uint32_t eventMask, const CallbackFunc& callback) override;

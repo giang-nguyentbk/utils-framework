@@ -37,7 +37,7 @@ namespace V1
 *		... 
 *   
 *       	IEventLoop::ReturnCode result;
-*       	IEventLoop& eventLoop = IEventLoop::getInstance();
+*       	IEventLoop& eventLoop = IEventLoop::getThreadLocalInstance();
 *
 *       	// Add some FDs to your event loop, similarly to the way you add some phone numbers
 *       	// and what to do when someone calls to those phone numbers.
@@ -75,7 +75,7 @@ public:
 	IEventLoop& operator=(const IEventLoop&)    = delete; // Copy assignment constructor
 	IEventLoop& operator=(IEventLoop&&)         = delete; // Move assignment constructor
 
-	static IEventLoop& getInstance();
+	static IEventLoop& getThreadLocalInstance();
 
 	/* Supported FD event type. Used in the event mask */
 	static constexpr uint32_t FdEventIn     = 0x001;    /*!< The FD is readable */

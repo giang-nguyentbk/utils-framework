@@ -24,7 +24,7 @@ namespace V1
 class ItcPubSubImpl : public IItcPubSub
 {
 public:
-	static ItcPubSubImpl& getInstance();
+	static ItcPubSubImpl& getThreadLocalInstance();
 	static void reset();
 
 	ReturnCode addItcFd(int fd) override;

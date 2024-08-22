@@ -1,0 +1,48 @@
+TIMER_DIR		:= $(SW_DIR)/timer
+TIMER_SRC_DIR		:= $(TIMER_DIR)/src
+
+TIMER_CXXFLAGS		:= -lpthread -L$(SDK_LIB_DIR) -ltraceif
+TIMER_LIBAR		:= libtimera.a # Static libary
+TIMER_LIBSO		:= libtimer.so # Dynamic libary
+
+TIMER_SRCS		=
+TIMER_SRCS		+= timerManagerImpl.cc
+
+TIMER_OBJS		:= $(TIMER_SRCS:%.cc=$(OBJ_DIR)/%.o)
+
+TIMER_INCS		:= \
+			-I$(TIMER_DIR)/if \
+			-I$(TIMER_DIR)/inc \
+			-I$(SW_DIR)/threadLocal/if \
+			-I$(SW_DIR)/eventLoop/if \
+			-I$(SW_DIR)/common \
+			-I$(SDK_INC_DIR)
+
+all: $(TIMER_OBJS) $(LIB_DIR)/$(TIMER_LIBAR) $(LIB_DIR)/$(TIMER_LIBSO) install-header-files-timerif
+
+# Build target 1 objects
+$(OBJ_DIR)/%.o: $(TIMER_SRC_DIR)/%.cc
+	@mkdir -p $(@D)
+	@cd $(<D)
+	@echo "  CXX \t\t $@"
+	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(TIMER_CXXFLAGS) $(TIMER_INCS) -o $@ $^
+
+$(LIB_DIR)/$(TIMER_LIBAR): $(TIMER_OBJS)
+	@mkdir -p $(@D)
+	@cd $(<D)
+	@echo "  AR \t\t $@"
+	@$(SELF_AR) $(SELF_ARFLAGS) $@ $^
+
+$(LIB_DIR)/$(TIMER_LIBSO): $(TIMER_OBJS)
+	@mkdir -p $(@D)
+	@cd $(<D)
+	@echo "  CXXLD \t $@"
+	@$(SELF_CXX) $(SELF_SOFLAGS) -o $@ $^
+
+install-header-files-timerif:
+	@mkdir -p $(INC_DIR)
+	@echo "  CPY \t\t $(TIMER_DIR)/if"
+	@$(SELF_CPY) $(TIMER_DIR)/if/*.h $(INC_DIR)
+
+clean-timerif:
+	$(SELF_RMV) $(TIMER_OBJS) $(LIB_DIR)/$(TIMER_LIBAR) $(LIB_DIR)/$(TIMER_LIBSO)

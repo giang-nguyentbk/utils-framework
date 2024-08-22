@@ -63,7 +63,7 @@ void ActiveObjectThread::mainFunction(const std::string& name, int eventFd, \
 {
 	prctl(PR_SET_NAME, name.c_str(), 0, 0, 0);
 
-	IEventLoop& eventLoop = IEventLoop::getInstance();
+	IEventLoop& eventLoop = IEventLoop::getThreadLocalInstance();
 	if(eventLoop.addFdHandler(eventFd, IEventLoop::FdEventIn, fdHandler) != IEventLoop::ReturnCode::NORMAL)
 	{
 		return;
@@ -87,7 +87,7 @@ void ActiveObjectThread::mainFunction(const std::string& name, int eventFd, \
 
 void ActiveObjectThread::stopEventLoop(int eventFd)
 {
-	IEventLoop& eventLoop = IEventLoop::getInstance();
+	IEventLoop& eventLoop = IEventLoop::getThreadLocalInstance();
 	if(eventFd != -1)
 	{
 		eventLoop.removeFdHandler(eventFd);
