@@ -35,7 +35,7 @@ public:
 	StartupRegistryImpl& operator=(StartupRegistryImpl&& other) = delete;
 
 	void registerModuleAllocator(const UtilsFramework::Startup::V1::IStartupModule::StartupModuleAllocatorFunction& allocator) override;
-	bool startAllModules(const std::chrono::seconds& startupTimeout) override;
+	bool startAllModules(const std::chrono::seconds& startupTimeout = 1min) override;
 
 private:
 	std::vector<UtilsFramework::Startup::V1::IStartupModule::StartupModuleAllocatorFunction> m_allocatorFuncVec;

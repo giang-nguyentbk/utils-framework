@@ -25,7 +25,7 @@ $(OBJ_DIR)/%.o: $(TIMER_SRC_DIR)/%.cc
 	@mkdir -p $(@D)
 	@cd $(<D)
 	@echo "  CXX \t\t $@"
-	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(TIMER_CXXFLAGS) $(TIMER_INCS) -o $@ $^
+	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(TIMER_INCS) $^ -o $@
 
 $(LIB_DIR)/$(TIMER_LIBAR): $(TIMER_OBJS)
 	@mkdir -p $(@D)
@@ -37,12 +37,15 @@ $(LIB_DIR)/$(TIMER_LIBSO): $(TIMER_OBJS)
 	@mkdir -p $(@D)
 	@cd $(<D)
 	@echo "  CXXLD \t $@"
-	@$(SELF_CXX) $(SELF_SOFLAGS) -o $@ $^
+	@$(SELF_CXX) $(SELF_SOFLAGS) $^ $(TIMER_CXXFLAGS) -o $@
 
 install-header-files-timerif:
 	@mkdir -p $(INC_DIR)
-	@echo "  CPY \t\t $(TIMER_DIR)/if"
+	@echo "  COPY \t\t $(TIMER_DIR)/if"
 	@$(SELF_CPY) $(TIMER_DIR)/if/*.h $(INC_DIR)
 
 clean-timerif:
-	$(SELF_RMV) $(TIMER_OBJS) $(LIB_DIR)/$(TIMER_LIBAR) $(LIB_DIR)/$(TIMER_LIBSO)
+	@echo "  RMV \t\t $(BIN_DIR)/timerif"
+	@$(SELF_RMV) $(TIMER_OBJS) $(LIB_DIR)/$(TIMER_LIBAR) $(LIB_DIR)/$(TIMER_LIBSO)
+	@$(SELF_RMV) $(INC_DIR)/timerManagerIf.h
+	@$(SELF_RMV) $(INC_DIR)/timerSubscriberIf.h

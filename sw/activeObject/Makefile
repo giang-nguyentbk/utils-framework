@@ -25,7 +25,7 @@ $(OBJ_DIR)/%.o: $(ACTIVEOBJECT_SRC_DIR)/%.cc
 	@mkdir -p $(@D)
 	@cd $(<D)
 	@echo "  CXX \t\t $@"
-	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(ACTIVEOBJECT_CXXFLAGS) $(ACTIVEOBJECT_INCS) -o $@ $^
+	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(ACTIVEOBJECT_INCS) $^ -o $@
 
 $(LIB_DIR)/$(ACTIVEOBJECT_LIBAR): $(ACTIVEOBJECT_OBJS)
 	@mkdir -p $(@D)
@@ -37,12 +37,14 @@ $(LIB_DIR)/$(ACTIVEOBJECT_LIBSO): $(ACTIVEOBJECT_OBJS)
 	@mkdir -p $(@D)
 	@cd $(<D)
 	@echo "  CXXLD \t $@"
-	@$(SELF_CXX) $(SELF_SOFLAGS) -o $@ $^
+	@$(SELF_CXX) $(SELF_SOFLAGS) $^ $(ACTIVEOBJECT_CXXFLAGS) -o $@
 
 install-header-files-activeobjectif:
 	@mkdir -p $(INC_DIR)
-	@echo "  CPY \t\t $(ACTIVEOBJECT_DIR)/if"
+	@echo "  COPY \t\t $(ACTIVEOBJECT_DIR)/if"
 	@$(SELF_CPY) $(ACTIVEOBJECT_DIR)/if/*.h $(INC_DIR)
 
 clean-activeobjectif:
-	$(SELF_RMV) $(ACTIVEOBJECT_OBJS) $(LIB_DIR)/$(ACTIVEOBJECT_LIBAR) $(LIB_DIR)/$(ACTIVEOBJECT_LIBSO)
+	@echo "  RMV \t\t $(BIN_DIR)/activeobjectif"
+	@$(SELF_RMV) $(ACTIVEOBJECT_OBJS) $(LIB_DIR)/$(ACTIVEOBJECT_LIBAR) $(LIB_DIR)/$(ACTIVEOBJECT_LIBSO)
+	@$(SELF_RMV) $(INC_DIR)/activeObjectIf.h

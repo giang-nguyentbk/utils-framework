@@ -24,7 +24,7 @@ $(OBJ_DIR)/%.o: $(EVENTLOOP_SRC_DIR)/%.cc
 	@mkdir -p $(@D)
 	@cd $(<D)
 	@echo "  CXX \t\t $@"
-	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(EVENTLOOP_CXXFLAGS) $(EVENTLOOP_INCS) -o $@ $^
+	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(EVENTLOOP_INCS) $^ -o $@
 
 $(LIB_DIR)/$(EVENTLOOP_LIBAR): $(EVENTLOOP_OBJS)
 	@mkdir -p $(@D)
@@ -36,12 +36,14 @@ $(LIB_DIR)/$(EVENTLOOP_LIBSO): $(EVENTLOOP_OBJS)
 	@mkdir -p $(@D)
 	@cd $(<D)
 	@echo "  CXXLD \t $@"
-	@$(SELF_CXX) $(SELF_SOFLAGS) -o $@ $^
+	@$(SELF_CXX) $(SELF_SOFLAGS) $^ $(EVENTLOOP_CXXFLAGS) -o $@
 
 install-header-files-eventloopif:
 	@mkdir -p $(INC_DIR)
-	@echo "  CPY \t\t $(EVENTLOOP_DIR)/if"
+	@echo "  COPY \t\t $(EVENTLOOP_DIR)/if"
 	@$(SELF_CPY) $(EVENTLOOP_DIR)/if/*.h $(INC_DIR)
 
 clean-eventloopif:
-	$(SELF_RMV) $(EVENTLOOP_OBJS) $(LIB_DIR)/$(EVENTLOOP_LIBAR) $(LIB_DIR)/$(EVENTLOOP_LIBSO)
+	@echo "  RMV \t\t $(BIN_DIR)/eventloopif"
+	@$(SELF_RMV) $(EVENTLOOP_OBJS) $(LIB_DIR)/$(EVENTLOOP_LIBAR) $(LIB_DIR)/$(EVENTLOOP_LIBSO)
+	@$(SELF_RMV) $(INC_DIR)/eventLoopIf.h

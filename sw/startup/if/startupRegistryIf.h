@@ -14,6 +14,8 @@
 
 #include "startupModuleIf.h"
 
+using namespace std::chrono_literals;
+
 namespace UtilsFramework
 {
 namespace Startup
@@ -34,7 +36,7 @@ public:
 	IStartupRegistry& operator=(IStartupRegistry&& other) = delete;
 
 	virtual void registerModuleAllocator(const UtilsFramework::Startup::V1::IStartupModule::StartupModuleAllocatorFunction& allocator) = 0;
-	virtual bool startAllModules(const std::chrono::seconds& startupTimeout) = 0;
+	virtual bool startAllModules(const std::chrono::seconds& startupTimeout = 1min) = 0;
 
 protected:
 	IStartupRegistry() = default;

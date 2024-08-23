@@ -1,7 +1,7 @@
 ITCPUBSUB_DIR		:= $(SW_DIR)/itcPubSub
 ITCPUBSUB_SRC_DIR	:= $(ITCPUBSUB_DIR)/src
 
-ITCPUBSUB_CXXFLAGS	:= -lpthread -L$(LIB_DIR) -leventloop -L$(SDK_LIB_DIR) -litc -ltraceif
+ITCPUBSUB_CXXFLAGS	:= -lpthread -L$(LIB_DIR) -L$(SDK_LIB_DIR) -leventloop -litc -ltraceif
 ITCPUBSUB_LIBAR		:= libitcpubsuba.a # Static libary
 ITCPUBSUB_LIBSO		:= libitcpubsub.so # Dynamic libary
 
@@ -25,7 +25,7 @@ $(OBJ_DIR)/%.o: $(ITCPUBSUB_SRC_DIR)/%.cc
 	@mkdir -p $(@D)
 	@cd $(<D)
 	@echo "  CXX \t\t $@"
-	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(ITCPUBSUB_CXXFLAGS) $(ITCPUBSUB_INCS) -o $@ $^
+	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(ITCPUBSUB_INCS) $^ -o $@
 
 $(LIB_DIR)/$(ITCPUBSUB_LIBAR): $(ITCPUBSUB_OBJS)
 	@mkdir -p $(@D)
@@ -37,12 +37,14 @@ $(LIB_DIR)/$(ITCPUBSUB_LIBSO): $(ITCPUBSUB_OBJS)
 	@mkdir -p $(@D)
 	@cd $(<D)
 	@echo "  CXXLD \t $@"
-	@$(SELF_CXX) $(SELF_SOFLAGS) -o $@ $^
+	@$(SELF_CXX) $(SELF_SOFLAGS) $^ $(ITCPUBSUB_CXXFLAGS) -o $@
 
 install-header-files-itcpubsubif:
 	@mkdir -p $(INC_DIR)
-	@echo "  CPY \t\t $(ITCPUBSUB_DIR)/if"
+	@echo "  COPY \t\t $(ITCPUBSUB_DIR)/if"
 	@$(SELF_CPY) $(ITCPUBSUB_DIR)/if/*.h $(INC_DIR)
 
 clean-itcpubsubif:
-	$(SELF_RMV) $(ITCPUBSUB_OBJS) $(LIB_DIR)/$(ITCPUBSUB_LIBAR) $(LIB_DIR)/$(ITCPUBSUB_LIBSO)
+	@echo "  RMV \t\t $(BIN_DIR)/itcpubsubif"
+	@$(SELF_RMV) $(ITCPUBSUB_OBJS) $(LIB_DIR)/$(ITCPUBSUB_LIBAR) $(LIB_DIR)/$(ITCPUBSUB_LIBSO)
+	@$(SELF_RMV) $(INC_DIR)/itcPubSubIf.h

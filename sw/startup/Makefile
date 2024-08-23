@@ -26,7 +26,7 @@ $(OBJ_DIR)/%.o: $(STARTUP_SRC_DIR)/%.cc
 	@mkdir -p $(@D)
 	@cd $(<D)
 	@echo "  CXX \t\t $@"
-	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(STARTUP_CXXFLAGS) $(STARTUP_INCS) -o $@ $^
+	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(STARTUP_INCS) $^ -o $@
 
 $(LIB_DIR)/$(STARTUP_LIBAR): $(STARTUP_OBJS)
 	@mkdir -p $(@D)
@@ -38,12 +38,16 @@ $(LIB_DIR)/$(STARTUP_LIBSO): $(STARTUP_OBJS)
 	@mkdir -p $(@D)
 	@cd $(<D)
 	@echo "  CXXLD \t $@"
-	@$(SELF_CXX) $(SELF_SOFLAGS) -o $@ $^
+	@$(SELF_CXX) $(SELF_SOFLAGS) $^ $(STARTUP_CXXFLAGS) -o $@
 
 install-header-files-startupif:
 	@mkdir -p $(INC_DIR)
-	@echo "  CPY \t\t $(STARTUP_DIR)/if"
+	@echo "  COPY \t\t $(STARTUP_DIR)/if"
 	@$(SELF_CPY) $(STARTUP_DIR)/if/*.h $(INC_DIR)
 
 clean-startupif:
-	$(SELF_RMV) $(STARTUP_OBJS) $(LIB_DIR)/$(STARTUP_LIBAR) $(LIB_DIR)/$(STARTUP_LIBSO)
+	@echo "  RMV \t\t $(BIN_DIR)/startupif"
+	@$(SELF_RMV) $(STARTUP_OBJS) $(LIB_DIR)/$(STARTUP_LIBAR) $(LIB_DIR)/$(STARTUP_LIBSO)
+	@$(SELF_RMV) $(INC_DIR)/startupModuleIf.h
+	@$(SELF_RMV) $(INC_DIR)/startupRegistrarIf.h
+	@$(SELF_RMV) $(INC_DIR)/startupRegistryIf.h
