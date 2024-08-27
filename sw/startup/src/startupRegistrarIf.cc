@@ -10,7 +10,7 @@ namespace V1
 
 IStartupRegistrar::IStartupRegistrar(const IStartupModule::StartupModuleAllocatorFunction& allocator)
 {
-	UtilsFramework::Startup::V1::IStartupRegistry::getThreadLocalInstance().registerModuleAllocator(allocator);
+	UtilsFramework::Startup::V1::IStartupRegistry::getInstance().registerModuleAllocator(allocator);
 }
 
 } // namespace V1

@@ -28,7 +28,7 @@ class StartupRegistryImpl;
 class IStartupRegistry
 {
 public:
-	static IStartupRegistry& getThreadLocalInstance();
+	static IStartupRegistry& getInstance();
 
 	IStartupRegistry(const IStartupRegistry& other) = delete;
 	IStartupRegistry(IStartupRegistry&& other) = delete;

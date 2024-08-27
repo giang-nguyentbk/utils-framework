@@ -23,7 +23,7 @@ namespace V1
 class StartupRegistryImpl : public IStartupRegistry
 {
 public:
-	static StartupRegistryImpl& getThreadLocalInstance();
+	static StartupRegistryImpl& getInstance();
 	static void reset();
 
 	StartupRegistryImpl() = default;

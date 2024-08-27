@@ -7,7 +7,7 @@ using namespace UtilsFramework::Startup::V1;
 
 int main()
 {
-	auto res = IStartupRegistry::getThreadLocalInstance().startAllModules(30s);
+	auto res = IStartupRegistry::getInstance().startAllModules(30s);
 
 	if(!res)
 	{

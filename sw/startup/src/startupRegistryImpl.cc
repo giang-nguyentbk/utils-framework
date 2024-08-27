@@ -4,9 +4,7 @@
 #include "util_framework_tpt_provider.h"
 #include "startupRegistryImpl.h"
 #include "preparationPhaseResponderImpl.h"
-#include "threadLocalIf.h"
 
-using namespace UtilsFramework::ThreadLocal::V1;
 using namespace CommonUtils::V1::StringUtils;
 
 namespace UtilsFramework
@@ -16,20 +14,15 @@ namespace Startup
 namespace V1
 {
 
-IStartupRegistry& IStartupRegistry::getThreadLocalInstance()
+IStartupRegistry& IStartupRegistry::getInstance()
 {
-    	return StartupRegistryImpl::getThreadLocalInstance();
+    	return StartupRegistryImpl::getInstance();
 }
 
-StartupRegistryImpl& StartupRegistryImpl::getThreadLocalInstance()
+StartupRegistryImpl& StartupRegistryImpl::getInstance()
 {
-    	return IThreadLocal<StartupRegistryImpl>::get();
-}
-
-void StartupRegistryImpl::reset()
-{
-	TPT_TRACE(TRACE_INFO, SSTR("Resetting StartupRegistryImpl..."));
-    	IThreadLocal<StartupRegistryImpl>::reset();
+	static StartupRegistryImpl instance;
+    	return instance;
 }
 
 StartupRegistryImpl::~StartupRegistryImpl()
