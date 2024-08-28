@@ -26,7 +26,7 @@ $(OBJ_FILES): $(SW_DIR)/timer/unittest/timerManagerTest.cc
 
 $(BIN_DIR)/$(TARGET): $(OBJ_FILES)
 	@echo "  LINKING \t $@"
-	@$(CXX) $^ -L$(SDK_LIB_DIR) -leventloopa -ltimera -ltraceifa -o $@
+	@$(CXX) $^ -L$(SDK_LIB_DIR) -leventloop -ltimer -ltraceif -o $@
 
 run:
 	@$(BIN_DIR)/$(TARGET)
