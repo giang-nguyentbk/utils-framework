@@ -2,7 +2,7 @@ ACTIVEOBJECT_DIR	:= $(SW_DIR)/activeObject
 ACTIVEOBJECT_SRC_DIR	:= $(ACTIVEOBJECT_DIR)/src
 
 ACTIVEOBJECT_CXXFLAGS	:= -lpthread -L$(LIB_DIR) -leventloop
-ACTIVEOBJECT_LIBAR	:= libactiveobjecta.a # Static libary
+# ACTIVEOBJECT_LIBAR	:= libactiveobjecta.a # Static libary
 ACTIVEOBJECT_LIBSO	:= libactiveobject.so # Dynamic libary
 
 ACTIVEOBJECT_SRCS	=
@@ -18,7 +18,8 @@ ACTIVEOBJECT_INCS	:= \
 		-I$(SW_DIR)/eventLoop/if \
 		-I$(SDK_INC_DIR)
 
-all: $(ACTIVEOBJECT_OBJS) $(LIB_DIR)/$(ACTIVEOBJECT_LIBAR) $(LIB_DIR)/$(ACTIVEOBJECT_LIBSO) install-header-files-activeobjectif
+# all: $(ACTIVEOBJECT_OBJS) $(LIB_DIR)/$(ACTIVEOBJECT_LIBAR) $(LIB_DIR)/$(ACTIVEOBJECT_LIBSO) install-header-files-activeobjectif
+all: $(ACTIVEOBJECT_OBJS) $(LIB_DIR)/$(ACTIVEOBJECT_LIBSO) install-header-files-activeobjectif
 
 # Build target 1 objects
 $(OBJ_DIR)/%.o: $(ACTIVEOBJECT_SRC_DIR)/%.cc
@@ -27,11 +28,14 @@ $(OBJ_DIR)/%.o: $(ACTIVEOBJECT_SRC_DIR)/%.cc
 	@echo "  CXX \t\t $@"
 	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(ACTIVEOBJECT_INCS) $^ -o $@
 
-$(LIB_DIR)/$(ACTIVEOBJECT_LIBAR): $(ACTIVEOBJECT_OBJS)
-	@mkdir -p $(@D)
-	@cd $(<D)
-	@echo "  AR \t\t $@"
-	@$(SELF_AR) $(SELF_ARFLAGS) $@ $^
+##### CANNOT BUILD STATIC LIBRARY FOR LEVEL-2 LIBRARY OR UPWARD #####
+##### TO DO THIS, COMBINE THIS LIBRARY'S OBJECTS WITH ALL OTHER LEVEL-1 OBJECT BY YOURSELF WITH 'AR' COMMAND #####
+##### OR JUST USING GNU-LIBTOOL OR SIMILARITIES INSTEAD #####
+# $(LIB_DIR)/$(ACTIVEOBJECT_LIBAR): $(ACTIVEOBJECT_OBJS)
+# 	@mkdir -p $(@D)
+# 	@cd $(<D)
+# 	@echo "  AR \t\t $@"
+# 	@$(SELF_AR) $(SELF_ARFLAGS) $@ $^
 
 $(LIB_DIR)/$(ACTIVEOBJECT_LIBSO): $(ACTIVEOBJECT_OBJS)
 	@mkdir -p $(@D)
@@ -46,5 +50,5 @@ install-header-files-activeobjectif:
 
 clean-activeobjectif:
 	@echo "  RMV \t\t $(BIN_DIR)/activeobjectif"
-	@$(SELF_RMV) $(ACTIVEOBJECT_OBJS) $(LIB_DIR)/$(ACTIVEOBJECT_LIBAR) $(LIB_DIR)/$(ACTIVEOBJECT_LIBSO)
+	@$(SELF_RMV) $(ACTIVEOBJECT_OBJS) $(LIB_DIR)/$(ACTIVEOBJECT_LIBSO)
 	@$(SELF_RMV) $(INC_DIR)/activeObjectIf.h

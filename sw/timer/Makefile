@@ -2,7 +2,7 @@ TIMER_DIR		:= $(SW_DIR)/timer
 TIMER_SRC_DIR		:= $(TIMER_DIR)/src
 
 TIMER_CXXFLAGS		:= -lpthread -L$(SDK_LIB_DIR) -ltraceif
-TIMER_LIBAR		:= libtimera.a # Static libary
+# TIMER_LIBAR		:= libtimera.a # Static libary
 TIMER_LIBSO		:= libtimer.so # Dynamic libary
 
 TIMER_SRCS		=
@@ -18,7 +18,8 @@ TIMER_INCS		:= \
 			-I$(SW_DIR)/common \
 			-I$(SDK_INC_DIR)
 
-all: $(TIMER_OBJS) $(LIB_DIR)/$(TIMER_LIBAR) $(LIB_DIR)/$(TIMER_LIBSO) install-header-files-timerif
+# all: $(TIMER_OBJS) $(LIB_DIR)/$(TIMER_LIBAR) $(LIB_DIR)/$(TIMER_LIBSO) install-header-files-timerif
+all: $(TIMER_OBJS) $(LIB_DIR)/$(TIMER_LIBSO) install-header-files-timerif
 
 # Build target 1 objects
 $(OBJ_DIR)/%.o: $(TIMER_SRC_DIR)/%.cc
@@ -27,11 +28,14 @@ $(OBJ_DIR)/%.o: $(TIMER_SRC_DIR)/%.cc
 	@echo "  CXX \t\t $@"
 	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(TIMER_INCS) $^ -o $@
 
-$(LIB_DIR)/$(TIMER_LIBAR): $(TIMER_OBJS)
-	@mkdir -p $(@D)
-	@cd $(<D)
-	@echo "  AR \t\t $@"
-	@$(SELF_AR) $(SELF_ARFLAGS) $@ $^
+##### CANNOT BUILD STATIC LIBRARY FOR LEVEL-2 LIBRARY OR UPWARD #####
+##### TO DO THIS, COMBINE THIS LIBRARY'S OBJECTS WITH ALL OTHER LEVEL-1 OBJECT BY YOURSELF WITH 'AR' COMMAND #####
+##### OR JUST USING GNU-LIBTOOL OR SIMILARITIES INSTEAD #####
+# $(LIB_DIR)/$(TIMER_LIBAR): $(TIMER_OBJS)
+# 	@mkdir -p $(@D)
+# 	@cd $(<D)
+# 	@echo "  AR \t\t $@"
+# 	@$(SELF_AR) $(SELF_ARFLAGS) $@ $^
 
 $(LIB_DIR)/$(TIMER_LIBSO): $(TIMER_OBJS)
 	@mkdir -p $(@D)
@@ -46,6 +50,6 @@ install-header-files-timerif:
 
 clean-timerif:
 	@echo "  RMV \t\t $(BIN_DIR)/timerif"
-	@$(SELF_RMV) $(TIMER_OBJS) $(LIB_DIR)/$(TIMER_LIBAR) $(LIB_DIR)/$(TIMER_LIBSO)
+	@$(SELF_RMV) $(TIMER_OBJS) $(LIB_DIR)/$(TIMER_LIBSO)
 	@$(SELF_RMV) $(INC_DIR)/timerManagerIf.h
 	@$(SELF_RMV) $(INC_DIR)/timerSubscriberIf.h

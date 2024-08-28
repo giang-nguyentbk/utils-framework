@@ -2,7 +2,7 @@ ITCPUBSUB_DIR		:= $(SW_DIR)/itcPubSub
 ITCPUBSUB_SRC_DIR	:= $(ITCPUBSUB_DIR)/src
 
 ITCPUBSUB_CXXFLAGS	:= -lpthread -L$(LIB_DIR) -L$(SDK_LIB_DIR) -leventloop -litc -ltraceif
-ITCPUBSUB_LIBAR		:= libitcpubsuba.a # Static libary
+# ITCPUBSUB_LIBAR		:= libitcpubsuba.a # Static libary
 ITCPUBSUB_LIBSO		:= libitcpubsub.so # Dynamic libary
 
 ITCPUBSUB_SRCS		=
@@ -18,7 +18,8 @@ ITCPUBSUB_INCS		:= \
 			-I$(SW_DIR)/common \
 			-I$(SDK_INC_DIR)
 
-all: $(ITCPUBSUB_OBJS) $(LIB_DIR)/$(ITCPUBSUB_LIBAR) $(LIB_DIR)/$(ITCPUBSUB_LIBSO) install-header-files-itcpubsubif
+# all: $(ITCPUBSUB_OBJS) $(LIB_DIR)/$(ITCPUBSUB_LIBAR) $(LIB_DIR)/$(ITCPUBSUB_LIBSO) install-header-files-itcpubsubif
+all: $(ITCPUBSUB_OBJS) $(LIB_DIR)/$(ITCPUBSUB_LIBSO) install-header-files-itcpubsubif
 
 # Build target 1 objects
 $(OBJ_DIR)/%.o: $(ITCPUBSUB_SRC_DIR)/%.cc
@@ -27,11 +28,14 @@ $(OBJ_DIR)/%.o: $(ITCPUBSUB_SRC_DIR)/%.cc
 	@echo "  CXX \t\t $@"
 	@$(SELF_CXX) $(SELF_LDFLAGS) $(SELF_CFLAGS) $(ITCPUBSUB_INCS) $^ -o $@
 
-$(LIB_DIR)/$(ITCPUBSUB_LIBAR): $(ITCPUBSUB_OBJS)
-	@mkdir -p $(@D)
-	@cd $(<D)
-	@echo "  AR \t\t $@"
-	@$(SELF_AR) $(SELF_ARFLAGS) $@ $^
+##### CANNOT BUILD STATIC LIBRARY FOR LEVEL-2 LIBRARY OR UPWARD #####
+##### TO DO THIS, COMBINE THIS LIBRARY'S OBJECTS WITH ALL OTHER LEVEL-1 OBJECT BY YOURSELF WITH 'AR' COMMAND #####
+##### OR JUST USING GNU-LIBTOOL OR SIMILARITIES INSTEAD #####
+# $(LIB_DIR)/$(ITCPUBSUB_LIBAR): $(ITCPUBSUB_OBJS)
+# 	@mkdir -p $(@D)
+# 	@cd $(<D)
+# 	@echo "  AR \t\t $@"
+# 	@$(SELF_AR) $(SELF_ARFLAGS) $@ $^
 
 $(LIB_DIR)/$(ITCPUBSUB_LIBSO): $(ITCPUBSUB_OBJS)
 	@mkdir -p $(@D)
@@ -46,5 +50,5 @@ install-header-files-itcpubsubif:
 
 clean-itcpubsubif:
 	@echo "  RMV \t\t $(BIN_DIR)/itcpubsubif"
-	@$(SELF_RMV) $(ITCPUBSUB_OBJS) $(LIB_DIR)/$(ITCPUBSUB_LIBAR) $(LIB_DIR)/$(ITCPUBSUB_LIBSO)
+	@$(SELF_RMV) $(ITCPUBSUB_OBJS) $(LIB_DIR)/$(ITCPUBSUB_LIBSO)
 	@$(SELF_RMV) $(INC_DIR)/itcPubSubIf.h
